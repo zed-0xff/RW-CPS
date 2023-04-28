@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>CPS_ThePit</defName>
+    <label>the pit</label>
+    <description>blah blah</description>
+    <thingClass>zed_0xff.CPS.Building_ThePit</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Misc/ThePit_south</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(4,4)</drawSize>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot> <!-- pawn heads will be naturally placed -->
+    <constructEffect>ConstructDirt</constructEffect>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <useHitPoints>false</useHitPoints>
+    <size>(2,2)</size>
+    <canOverlapZones>false</canOverlapZones>
+    <statBases>
+      <WorkToBuild>1600</WorkToBuild>
+      <Flammability>0</Flammability>
+      <Beauty>-200</Beauty>
+      <Cleanliness>-75</Cleanliness>
+      <SurgerySuccessChanceFactor>0.5</SurgerySuccessChanceFactor>
+      <BirthRitualQualityOffset MayRequire="Ludeon.RimWorld.Biotech">-20</BirthRitualQualityOffset>
+    </statBases>
+    <passability>Standable</passability>
+    <building>
+      <artificialForMeditationPurposes>false</artificialForMeditationPurposes>
+      <ai_chillDestination>false</ai_chillDestination>
+      <bed_canBeMedical>false</bed_canBeMedical>
+      <isInert>true</isInert>
+      <isFence>true</isFence>
+    </building>
+    <terrainAffordanceNeeded>Diggable</terrainAffordanceNeeded>
+    <designationCategory>Misc</designationCategory>
+    <pathCost>15</pathCost>
+    <fillPercent>0</fillPercent>
+    <surfaceType>Item</surfaceType>
+    <comps>
+      <li Class="CompProperties_AssignableToPawn">
+        <drawAssignmentOverlay>false</drawAssignmentOverlay>
+        <compClass>CompAssignableToPawn_Bed</compClass>
+      </li>
+    </comps>
+    <uiOrder>2051</uiOrder>
+    <uiIconPath>Things/Building/Misc/ThePit_north</uiIconPath>
+    <uiIconScale>1.8</uiIconScale>
+    <tickerType>Rare</tickerType>
+  </ThingDef>
+
+</Defs>
