@@ -11,8 +11,8 @@ namespace zed_0xff.CPS {
     {
         static bool Prefix(Building_Bed __instance, ref int __result)
         {
-            if( __instance is Building_ThePit ){
-                __result = Building_ThePit.maxSlots;
+            if( __instance is Building_Base b ){
+                __result = b.MaxSlots;
                 return false;
             }
 
@@ -24,8 +24,12 @@ namespace zed_0xff.CPS {
     static class Patch_GetSleepingSlotPos
     {
         static bool Prefix(Building_Bed __instance, ref IntVec3 __result, int index){
-            if( __instance is Building_ThePit ){
-                index = index & 3; // map 5th slot to 1st, we'll fix draw position later
+            if( __instance is Building_Base ){
+                int t = __instance.def.size.x * __instance.def.size.z;
+                while( index >= t ){
+                    // over-assign extra slots, we'll fix draw position later
+                    index -= t;
+                }
                 int pos = 0;
                 foreach (IntVec3 cell in __instance.OccupiedRect()){
                     if( pos == index ){
@@ -46,8 +50,8 @@ namespace zed_0xff.CPS {
     {
         static bool Prefix(Building_Bed __instance, int slotIndex, ref Pawn __result)
         {
-            if ( __instance is Building_ThePit pit ){
-                __result = pit.GetCurOccupant(slotIndex);
+            if ( __instance is Building_Base b ){
+                __result = b.GetCurOccupant(slotIndex);
                 return false;
             }
             return true;
@@ -60,8 +64,8 @@ namespace zed_0xff.CPS {
     {
         static bool Prefix(Building_Bed __instance, IntVec3 pos, ref Pawn __result)
         {
-            if ( __instance is Building_ThePit pit ){
-                __result = pit.GetCurOccupantAt(pos);
+            if ( __instance is Building_Base b ){
+                __result = b.GetCurOccupantAt(pos);
                 return false;
             }
             return true;

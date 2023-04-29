@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>CPS_ThePit</defName>
+    <label>the pit</label>
+    <description>blah blah</description>
+    <thingClass>zed_0xff.CPS.Building_ThePit</thingClass>
+    <graphicData>
+      <texPath>Things/Building/CPS/ThePit_south</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(4,4)</drawSize>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot> <!-- pawn heads will be naturally placed -->
+    <constructEffect>ConstructDirt</constructEffect>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <useHitPoints>false</useHitPoints>
+    <size>(2,2)</size>
+    <canOverlapZones>false</canOverlapZones>
+    <statBases>
+      <WorkToBuild>1600</WorkToBuild>
+      <Flammability>0</Flammability>
+      <Beauty>-200</Beauty>
+      <Cleanliness>-75</Cleanliness>
+      <SurgerySuccessChanceFactor>0.5</SurgerySuccessChanceFactor>
+      <BirthRitualQualityOffset MayRequire="Ludeon.RimWorld.Biotech">-20</BirthRitualQualityOffset>
+    </statBases>
+    <passability>Standable</passability>
+    <building>
+      <artificialForMeditationPurposes>false</artificialForMeditationPurposes>
+      <ai_chillDestination>false</ai_chillDestination>
+      <bed_canBeMedical>false</bed_canBeMedical>
+      <isInert>true</isInert>
+      <isFence>true</isFence> <!-- hack for account pit as a room outside -->
+    </building>
+    <terrainAffordanceNeeded>Diggable</terrainAffordanceNeeded>
+    <designationCategory>Misc</designationCategory>
+    <pathCost>15</pathCost>
+    <fillPercent>0</fillPercent>
+    <surfaceType>Item</surfaceType>
+    <comps>
+      <li Class="CompProperties_AssignableToPawn">
+        <drawAssignmentOverlay>false</drawAssignmentOverlay>
+        <compClass>CompAssignableToPawn_Bed</compClass>
+      </li>
+    </comps>
+    <uiOrder>2051</uiOrder>
+    <uiIconPath>Things/Building/CPS/ThePit_north</uiIconPath>
+    <uiIconScale>1.8</uiIconScale>
+    <tickerType>Rare</tickerType>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>CPS_Cabin</defName>
+    <label>cabin</label>
+    <description>blah blah</description>
+    <thingClass>zed_0xff.CPS.Building_Cabin</thingClass>
+    <graphicData>
+      <texPath>Things/Building/CPS/Cabin</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(4.1,4.1)</drawSize>
+    </graphicData>
+    <size>(4,2)</size>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(-1,0,-1)</interactionCellOffset>
+    <canOverlapZones>false</canOverlapZones>
+    <statBases>
+      <WorkToBuild>8000</WorkToBuild>
+      <MaxHitPoints>1400</MaxHitPoints>
+      <Mass>500</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>-10</Beauty>
+      <BirthRitualQualityOffset MayRequire="Ludeon.RimWorld.Biotech">-1</BirthRitualQualityOffset>
+      <BedRestEffectiveness>1</BedRestEffectiveness>
+      <Comfort>0.5</Comfort>
+      <MedicalTendQualityOffset>-0.10</MedicalTendQualityOffset>
+    </statBases>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <building>
+      <artificialForMeditationPurposes>false</artificialForMeditationPurposes>
+      <ai_chillDestination>false</ai_chillDestination>
+      <bed_canBeMedical>false</bed_canBeMedical>
+      <bed_showSleeperBody>False</bed_showSleeperBody>
+      <bed_healPerDay>3</bed_healPerDay>
+      <paintable>true</paintable>
+      <isFence>true</isFence> <!-- hack for cabin to have its own temperature -->
+    </building>
+    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <designationCategory>Furniture</designationCategory>
+    <fillPercent>0.8</fillPercent>
+    <comps>
+      <li Class="CompProperties_AssignableToPawn">
+        <drawAssignmentOverlay>true</drawAssignmentOverlay>
+        <compClass>CompAssignableToPawn_Bed</compClass>
+      </li>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>200</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Flickable"/>
+      <li Class="CompProperties_TempControl">
+        <energyPerSecond>21</energyPerSecond>
+      </li>
+      <li Class="CompProperties_Breakdownable"/>
+    </comps>
+    <uiOrder>2010</uiOrder>
+    <tickerType>Rare</tickerType>
+    <costStuffCount>400</costStuffCount>
+    <costList>
+      <Steel>100</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
+    </costList>
+    <stuffCategories>
+      <li>Metallic</li>
+      <li>Woody</li>
+    </stuffCategories>
+    <researchPrerequisites>
+      <li>ComplexFurniture</li>
+      <li>AirConditioning</li>
+    </researchPrerequisites>
+    <constructionSkillPrerequisite>5</constructionSkillPrerequisite>
+    <castEdgeShadows>true</castEdgeShadows>
+    <blockLight>true</blockLight>
+    <staticSunShadowHeight>0.6</staticSunShadowHeight>
+  </ThingDef>
+
+</Defs>

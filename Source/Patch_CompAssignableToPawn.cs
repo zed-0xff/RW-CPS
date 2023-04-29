@@ -9,7 +9,7 @@ namespace zed_0xff.CPS
     {
         public static bool Prefix(CompAssignableToPawn_Bed __instance, ref bool __result)
         {
-            if (__instance.parent is Building_ThePit)
+            if (__instance.parent is Building_Base)
             {
                 __result = false;
                 return false;

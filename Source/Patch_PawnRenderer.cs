@@ -41,7 +41,7 @@ namespace zed_0xff.CPS {
         static void Prefix(ref PawnRenderer __instance, ref Vector3 rootLoc, ref bool renderBody){
             Pawn pawn = _pawn(__instance);
             if( pawn.IsPrisonerOfColony ){
-                Building_ThePit pit = Cache.Get(pawn.Position, pawn.Map);
+                Building_ThePit pit = Cache.Get(pawn.Position, pawn.Map) as Building_ThePit;
                 if( pit != null ){
                     if( pawn.GetPosture().InBed() ){
                         // shift 5th pawn's head while asleep
@@ -67,7 +67,7 @@ namespace zed_0xff.CPS {
 
         static bool Prefix(ref PawnRenderer __instance, ref Vector3 drawLoc){
             Pawn pawn = _pawn(__instance);
-            if( pawn.IsPrisonerOfColony ){
+            if( pawn.IsPrisonerOfColony && Cache.Get(pawn.Position, pawn.Map) is Building_ThePit ){
                 return false;
             }
             return true;
