@@ -60,7 +60,7 @@
       <texPath>Things/Building/CPS/Cabin</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(4.1,4.1)</drawSize>
+      <drawSize>(5.05,5.05)</drawSize>
     </graphicData>
     <size>(4,2)</size>
     <hasInteractionCell>true</hasInteractionCell>
@@ -105,7 +105,18 @@
         <energyPerSecond>21</energyPerSecond>
       </li>
       <li Class="CompProperties_Breakdownable"/>
+      <li>
+        <compClass>CompQuality</compClass>
+      </li>
+      <li Class="CompProperties_Art">
+        <nameMaker>NamerArtFurniture</nameMaker>
+        <descriptionMaker>ArtDescription_Furniture</descriptionMaker>
+        <minQualityForArtistic>Excellent</minQualityForArtistic>
+      </li>
     </comps>
+    <inspectorTabs>
+      <li>ITab_Art</li> <!-- for CompProperties_Art -->
+    </inspectorTabs>
     <uiOrder>2010</uiOrder>
     <tickerType>Rare</tickerType>
     <costStuffCount>400</costStuffCount>
