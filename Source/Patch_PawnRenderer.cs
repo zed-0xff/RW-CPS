@@ -13,20 +13,17 @@ namespace zed_0xff.CPS {
     [HarmonyPriority(Priority.Last)] // make it last to fix any offsets by other mods, fixes Yayo's animations
     static class Patch_GetBodyPos
     {
-        private static readonly AccessTools.FieldRef<PawnRenderer, Pawn> _pawn = AccessTools.FieldRefAccess<PawnRenderer, Pawn>("pawn");
-
-        static void Postfix(PawnRenderer __instance, Vector3 drawLoc, ref bool showBody, ref Vector3 __result)
+        static void Postfix(PawnRenderer __instance, Vector3 drawLoc, ref bool showBody, ref Vector3 __result, Pawn ___pawn)
         {
-            Pawn pawn = _pawn(__instance);
-            if( pawn == null || !pawn.RaceProps.Humanlike ) return;
+            if( ___pawn == null || !___pawn.RaceProps.Humanlike ) return;
 
-            Building_Base b = Cache.Get(pawn.Position, pawn.Map);
+            Building_Base b = Cache.Get(___pawn.Position, ___pawn.Map);
             if( b == null ) return;
 
-            if( pawn.GetPosture().InBed()){
+            if( ___pawn.GetPosture().InBed()){
                 // draw only heads of sleeping pawns
                 showBody = false;
-                b.FixSleepingPawnHeadPos(ref pawn, ref __result);
+                b.FixSleepingPawnHeadPos(ref ___pawn, ref __result);
             }
         }
     }
@@ -38,16 +35,13 @@ namespace zed_0xff.CPS {
     [HarmonyPriority(Priority.Last)] // TODO: check with Yayo's animations
     static class Patch_RenderPawnInternal
     {
-        private static readonly AccessTools.FieldRef<PawnRenderer, Pawn> _pawn = AccessTools.FieldRefAccess<PawnRenderer, Pawn>("pawn");
+        static void Prefix(ref PawnRenderer __instance, ref Vector3 rootLoc, ref bool renderBody, Pawn ___pawn){
+            if( !___pawn.RaceProps.Humanlike ) return;
 
-        static void Prefix(ref PawnRenderer __instance, ref Vector3 rootLoc, ref bool renderBody){
-            Pawn pawn = _pawn(__instance);
-            if( !pawn.RaceProps.Humanlike ) return;
-
-            Building_Base b = Cache.Get(pawn.Position, pawn.Map);
+            Building_Base b = Cache.Get(___pawn.Position, ___pawn.Map);
             if( b == null ) return;
 
-            if( b is Building_ThePit && pawn.IsPrisonerOfColony && !pawn.GetPosture().InBed() ){
+            if( b is Building_ThePit && ___pawn.IsPrisonerOfColony && !___pawn.GetPosture().InBed() ){
                 // hide bodies of not sleeping prisoners
                 renderBody = false;
                 rootLoc.z -= 0.4f;
@@ -61,8 +55,6 @@ namespace zed_0xff.CPS {
 //    [HarmonyPriority(Priority.Last)] // not sure
 //    static class Patch_GetBlitMeshUpdatedFrame
 //    {
-//        private static readonly AccessTools.FieldRef<PawnRenderer, Pawn> _pawn = AccessTools.FieldRefAccess<PawnRenderer, Pawn>("pawn");
-//
 //        static void Prefix(ref PawnRenderer __instance, ref PawnDrawMode drawMode){
 //            Pawn pawn = _pawn(__instance);
 //            if( !pawn.RaceProps.Humanlike ) return;
@@ -80,15 +72,12 @@ namespace zed_0xff.CPS {
     [HarmonyPriority(Priority.Last)] // not sure
     static class Patch_BodyAngle
     {
-        private static readonly AccessTools.FieldRef<PawnRenderer, Pawn> _pawn = AccessTools.FieldRefAccess<PawnRenderer, Pawn>("pawn");
-
-        static float Postfix(float __result, ref PawnRenderer __instance){
+        static float Postfix(float __result, ref PawnRenderer __instance, Pawn ___pawn){
             if( __result == 0f ) return __result; // most frequent case
 
-            Pawn pawn = _pawn(__instance);
-            if( !pawn.RaceProps.Humanlike ) return __result;
+            if( !___pawn.RaceProps.Humanlike ) return __result;
 
-            Building_Bed bed = pawn.CurrentBed();
+            Building_Bed bed = ___pawn.CurrentBed();
             if( bed is Building_Base ){
                 return 0f;
             }
@@ -100,11 +89,8 @@ namespace zed_0xff.CPS {
     [HarmonyPatch(typeof(PawnRenderer), "DrawInvisibleShadow")]
     static class Patch_DrawInvisibleShadow
     {
-        private static readonly AccessTools.FieldRef<PawnRenderer, Pawn> _pawn = AccessTools.FieldRefAccess<PawnRenderer, Pawn>("pawn");
-
-        static bool Prefix(ref PawnRenderer __instance, ref Vector3 drawLoc){
-            Pawn pawn = _pawn(__instance);
-            if( pawn.IsPrisonerOfColony && Cache.Get(pawn.Position, pawn.Map) is Building_ThePit ){
+        static bool Prefix(ref PawnRenderer __instance, ref Vector3 drawLoc, Pawn ___pawn){
+            if( ___pawn.IsPrisonerOfColony && Cache.Get(___pawn.Position, ___pawn.Map) is Building_ThePit ){
                 return false;
             }
             return true;
