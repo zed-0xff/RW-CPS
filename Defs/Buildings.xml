@@ -136,6 +136,11 @@
     <castEdgeShadows>true</castEdgeShadows>
     <blockLight>true</blockLight>
     <staticSunShadowHeight>0.6</staticSunShadowHeight>
+
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
   </ThingDef>
 
 </Defs>
