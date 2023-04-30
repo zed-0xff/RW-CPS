@@ -78,7 +78,7 @@
       <MedicalTendQualityOffset>-0.10</MedicalTendQualityOffset>
     </statBases>
     <passability>PassThroughOnly</passability>
-    <pathCost>50</pathCost>
+    <pathCost>24</pathCost>
     <building>
       <artificialForMeditationPurposes>false</artificialForMeditationPurposes>
       <ai_chillDestination>false</ai_chillDestination>
