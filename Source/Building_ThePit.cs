@@ -4,6 +4,7 @@ using System.Reflection;
 using RimWorld;
 using Verse;
 using HarmonyLib;
+using UnityEngine;
 
 namespace zed_0xff.CPS
 {
@@ -27,6 +28,16 @@ namespace zed_0xff.CPS
                 }
                 yield return gizmo;
             }
+        }
+
+        public override bool FixSleepingPawnHeadPos(ref Pawn pawn, ref Vector3 pos){
+            if( GetCurOccupantSlotIndexFast(pawn) == 4 ){
+                Vector3 center = this.OccupiedRect().CenterVector3;
+                pos.x = center.x;
+                pos.z = center.z - 0.5f;
+                return true;
+            }
+            return false;
         }
 
         // return pawns back in pit if they've been kicked out f.ex. by fighting each other

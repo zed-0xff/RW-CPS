@@ -11,9 +11,20 @@ namespace zed_0xff.CPS
         public bool IsDespawning = false;
 
         public abstract int MaxSlots { get; }
+        public abstract bool FixSleepingPawnHeadPos(ref Pawn pawn, ref Vector3 pos);
+
+        public bool FixSleepingPawnFramePos(ref Pawn pawn, ref Vector3 pos){
+            if( FixSleepingPawnHeadPos(ref pawn, ref pos) ){
+                pos.z += 0.5f;
+                return true;
+            }
+            return false;
+        }
 
         protected static readonly Texture2D pIcon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
         protected static readonly string pLabel = "CommandBedSetForPrisonersLabel".Translate();
+
+        private CompAssignableToPawn compAssignableToPawn = null;
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
@@ -22,10 +33,10 @@ namespace zed_0xff.CPS
             // this.Map is not yet set at this point
             Cache.Add(this, map);
             // fix number of sleeping slots
-            var p = GetComp<CompAssignableToPawn>();
-            p.Props.maxAssignedPawnsCount = MaxSlots;
+            compAssignableToPawn = GetComp<CompAssignableToPawn>();
+            compAssignableToPawn.Props.maxAssignedPawnsCount = MaxSlots;
             base.SpawnSetup(map, respawningAfterLoad);
-            p.Props.maxAssignedPawnsCount = MaxSlots;
+            compAssignableToPawn.Props.maxAssignedPawnsCount = MaxSlots;
         }
 
         // fix base NullReferenceException when CPS is a room for itself 
@@ -84,5 +95,29 @@ namespace zed_0xff.CPS
             return null;
         }
 
+        private Dictionary<Pawn, int> pawnSlotsCache = new Dictionary<Pawn, int>();
+
+        public int GetCurOccupantSlotIndexFast(Pawn p)
+        {
+            int r = 0;
+            if (pawnSlotsCache.TryGetValue(p, out r)){
+                return r;
+            }
+
+            // slower
+            return OwnersForReading.IndexOf(p);
+        }
+
+        public override void TickRare() {
+            pawnSlotsCache.Clear();
+            int i = 0;
+            foreach( Pawn p in OwnersForReading){
+                if( p != null ){
+                    pawnSlotsCache[p] = i;
+                }
+                i++;
+            }
+            base.TickRare();
+        }
     }
 }

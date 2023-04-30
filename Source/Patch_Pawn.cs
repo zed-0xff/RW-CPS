@@ -9,15 +9,18 @@ namespace zed_0xff.CPS {
     [HarmonyPatch(typeof(Pawn), "get_DrawPos")]
     static class Patch_DrawPos
     {
-        // shift 5th pawn's label
+        // fix __instance labels & select frame pos
+        // XXX does not influence draw position of a sleeping pawn :(
         static void Postfix(ref Pawn __instance, ref Vector3 __result)
         {
-            Building_ThePit pit = __instance.CurrentBed() as Building_ThePit;
-            if( pit == null ) return;
-            if( pit.GetCurOccupant(4) != __instance ) return;
+            if( !__instance.RaceProps.Humanlike ) return;
 
-            __result.x += 0.5f;
-            __result.z += 0.5f;
+            Building_Base b = Cache.Get(__instance.Position, __instance.Map);
+            if( b == null ) return;
+
+            if( !__instance.GetPosture().InBed()) return;
+
+            b.FixSleepingPawnFramePos(ref __instance, ref __result);
         }
     }
 }

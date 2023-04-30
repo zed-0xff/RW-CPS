@@ -29,6 +29,23 @@ namespace zed_0xff.CPS
             return (compPowerTrader != null) && compPowerTrader.PowerOn;
         }
 
+        public override bool FixSleepingPawnHeadPos(ref Pawn pawn, ref Vector3 pos){
+            int slot = GetCurOccupantSlotIndexFast(pawn);
+            CellRect r = this.OccupiedRect();
+            if( Rotation == Rot4.South || Rotation == Rot4.North ){
+                // horizontal
+                float slotWidth = 1.0f * r.Width / ((MaxSlots|1)/2);
+                pos.x = 0.5f + r.minX + (slot/2)*slotWidth;
+                pos.z = r.maxZ + (slot%2)*1.0f - 1.0f;
+            } else {
+                // vertical
+                float slotHeight = 1.0f * r.Height / ((MaxSlots|1)/2);
+                pos.x = 0.5f + r.minX + (slot%2)*1.0f;
+                pos.z = r.minZ + (slot/2)*slotHeight;
+            }
+            return true;
+        }
+
         // from Building_Heater, mostly as is
         private void heat(float ambientTemperature){
             if( !IsPowerOn() ) return;
