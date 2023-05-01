@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using Verse;
 using RimWorld;
 using UnityEngine;
@@ -99,7 +100,7 @@ namespace zed_0xff.CPS
 
         public int GetCurOccupantSlotIndexFast(Pawn p)
         {
-            int r = 0;
+            int r = -1;
             if (pawnSlotsCache.TryGetValue(p, out r)){
                 return r;
             }
@@ -108,16 +109,51 @@ namespace zed_0xff.CPS
             return OwnersForReading.IndexOf(p);
         }
 
+        // 1. update pawnSlotsCache
+        // 2. move pawns to their slots if they're sleeping on a wrong one
         public override void TickRare() {
             pawnSlotsCache.Clear();
             int i = 0;
-            foreach( Pawn p in OwnersForReading){
-                if( p != null ){
-                    pawnSlotsCache[p] = i;
+            var rect = this.OccupiedRect();
+            foreach( Pawn pawn in OwnersForReading){
+                if( pawn != null ){
+                    pawnSlotsCache[pawn] = i;
+                    if( pawn.GetPosture().InBed() && rect.Contains(pawn.Position) ){
+                        var pos = GetSleepingSlotPos(i);
+                        if( pawn.Position != pos ){
+                            if( Prefs.DevMode )
+                                Log.Message("[d] CPS: teleporting " + pawn + " from " + pawn.Position + " to their slot #" + i + " at " + pos);
+                            pawn.Position = pos;
+                            //pawn.Notify_Teleported(endCurrentJob: false, resetTweenedPos: false);
+                        }
+                    }
                 }
                 i++;
             }
             base.TickRare();
+        }
+
+        public override string GetInspectString(){
+            if( !Prefs.DevMode )
+                return base.GetInspectString();
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append(base.GetInspectString());
+            for( int i=0; i<MaxSlots; i++){
+                stringBuilder.AppendInNewLine("GetCurOccupant("+i+"): " + GetCurOccupant(i));
+            }
+            for( int i=0; i<MaxSlots; i++){
+                stringBuilder.AppendInNewLine("GetSleepingSlotPos("+i+"): " + GetSleepingSlotPos(i));
+            }
+            int j = 0;
+            foreach( Pawn p in OwnersForReading){
+                stringBuilder.AppendInNewLine("OwnersForReading["+j+"]: " + p);
+                j++;
+            }
+            foreach( var pos in this.OccupiedRect() ){
+                stringBuilder.AppendInNewLine("GetCurOccupantAt("+pos+"): " + GetCurOccupantAt(pos));
+            }
+            return stringBuilder.ToString();
         }
     }
 }
