@@ -12,7 +12,10 @@ namespace zed_0xff.CPS
         public bool IsDespawning = false;
 
         public abstract int MaxSlots { get; }
-        public abstract bool FixSleepingPawnHeadPos(ref Pawn pawn, ref Vector3 pos);
+
+        public virtual bool FixSleepingPawnHeadPos(ref Pawn pawn, ref Vector3 pos){
+            return false;
+        }
 
         public bool FixSleepingPawnFramePos(ref Pawn pawn, ref Vector3 pos){
             if( FixSleepingPawnHeadPos(ref pawn, ref pos) ){
@@ -25,7 +28,9 @@ namespace zed_0xff.CPS
         protected static readonly Texture2D pIcon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
         protected static readonly string pLabel = "CommandBedSetForPrisonersLabel".Translate();
 
-        private CompAssignableToPawn compAssignableToPawn = null;
+        protected CompAssignableToPawn compAssignableToPawn = null;
+        protected CompPowerTrader      compPowerTrader = null;
+        protected CompFlickable        compFlickable = null;
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
@@ -33,11 +38,22 @@ namespace zed_0xff.CPS
             // Cache.Add() should be called before base.SpawnSetup() or newly built buildings will not be rooms until save-load cycle
             // this.Map is not yet set at this point
             Cache.Add(this, map);
-            // fix number of sleeping slots
+
             compAssignableToPawn = GetComp<CompAssignableToPawn>();
+            compPowerTrader      = GetComp<CompPowerTrader>();
+            compFlickable        = GetComp<CompFlickable>();
+
+            // fix number of sleeping slots
             compAssignableToPawn.Props.maxAssignedPawnsCount = MaxSlots;
             base.SpawnSetup(map, respawningAfterLoad);
             compAssignableToPawn.Props.maxAssignedPawnsCount = MaxSlots;
+        }
+
+        public bool IsPowerOn(){
+            if( compFlickable != null && !compFlickable.SwitchIsOn )
+                return false;
+
+            return (compPowerTrader != null) && compPowerTrader.PowerOn;
         }
 
         // fix base NullReferenceException when CPS is a room for itself 
@@ -154,6 +170,14 @@ namespace zed_0xff.CPS
                 stringBuilder.AppendInNewLine("GetCurOccupantAt("+pos+"): " + GetCurOccupantAt(pos));
             }
             return stringBuilder.ToString();
+        }
+
+        // draw assigned/total slots count
+        public override void DrawGUIOverlay()
+        {
+            if ((int)Find.CameraDriver.CurrentZoom == 0){
+                GenMapUI.DrawThingLabel(this, OwnersForReading.Count + "/" + MaxSlots);
+            }
         }
     }
 }

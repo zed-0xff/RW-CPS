@@ -31,10 +31,11 @@ namespace zed_0xff.CPS
         public static void Postfix(ref bool __result, ref Room __instance)
         {
             if( !__result ) return;
+            if( __instance.CellCount == 0 ) return;
 
-            if( Cache.Get(__instance.Cells.First(), __instance.Map) is Building_Cabin c ){
-                if( __instance.CellCount == c.def.size.x * c.def.size.z ){
-                    __result = !c.IsPowerOn();
+            if( Cache.Get(__instance.Cells.First(), __instance.Map) is Building_Base b ){
+                if( __instance.CellCount == b.def.size.x * b.def.size.z ){
+                    __result = !b.IsPowerOn();
                 }
             }
         }

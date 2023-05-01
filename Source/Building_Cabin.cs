@@ -10,23 +10,12 @@ namespace zed_0xff.CPS
     public class Building_Cabin : Building_Base {
         public override int MaxSlots => 10;
 
-        public CompTempControl compTempControl;
-        public CompPowerTrader compPowerTrader;
-        public CompFlickable   compFlickable;
+        public CompTempControl compTempControl = null;
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
             base.SpawnSetup(map, respawningAfterLoad);
             compTempControl = GetComp<CompTempControl>();
-            compPowerTrader = GetComp<CompPowerTrader>();
-            compFlickable   = GetComp<CompFlickable>();
-        }
-
-        public bool IsPowerOn(){
-            if( compFlickable != null && !compFlickable.SwitchIsOn )
-                return false;
-
-            return (compPowerTrader != null) && compPowerTrader.PowerOn;
         }
 
         public override bool FixSleepingPawnHeadPos(ref Pawn pawn, ref Vector3 pos){
@@ -157,11 +146,5 @@ namespace zed_0xff.CPS
             }
         }
 
-        public override void DrawGUIOverlay()
-        {
-            if ((int)Find.CameraDriver.CurrentZoom == 0){
-                GenMapUI.DrawThingLabel(this, OwnersForReading.Count + "/" + MaxSlots);
-            }
-        }
     }
 }
