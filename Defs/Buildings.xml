@@ -87,13 +87,16 @@
       <bed_healPerDay>3</bed_healPerDay>
       <paintable>true</paintable>
       <isFence>true</isFence> <!-- hack for cabin to have its own temperature -->
+      <isSittable>true</isSittable>
+      <multiSittable>true</multiSittable>
     </building>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <designationCategory>Furniture</designationCategory>
     <fillPercent>0.8</fillPercent>
+    <drawGUIOverlay>true</drawGUIOverlay>
     <comps>
       <li Class="CompProperties_AssignableToPawn">
-        <drawAssignmentOverlay>true</drawAssignmentOverlay>
+        <drawAssignmentOverlay>false</drawAssignmentOverlay>
         <compClass>CompAssignableToPawn_Bed</compClass>
       </li>
       <li Class="CompProperties_Power">

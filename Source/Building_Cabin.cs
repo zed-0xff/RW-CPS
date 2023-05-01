@@ -156,5 +156,12 @@ namespace zed_0xff.CPS
                 yield return gizmo;
             }
         }
+
+        public override void DrawGUIOverlay()
+        {
+            if ((int)Find.CameraDriver.CurrentZoom == 0){
+                GenMapUI.DrawThingLabel(this, OwnersForReading.Count + "/" + MaxSlots);
+            }
+        }
     }
 }
