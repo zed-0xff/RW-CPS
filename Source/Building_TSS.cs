@@ -11,7 +11,7 @@ using Verse.Sound;
 
 namespace zed_0xff.CPS
 {
-    public class Building_TSS : Building_Enterable, IStoreSettingsParent, IThingHolder, IThingHolderWithDrawnPawn {
+    public class Building_TSS : Building_Enterable, IStoreSettingsParent, IThingHolderWithDrawnPawn {
         public /*override*/ int MaxSlots => 16;
 
         private int ticksWithoutPower = 0;
@@ -44,6 +44,82 @@ namespace zed_0xff.CPS
 
         public bool PowerOn => PowerTraderComp.PowerOn;
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // <forOwnerType>
+
+        public BedOwnerType ForOwnerType
+        {
+            get
+            {
+                return forOwnerType;
+            }
+            set
+            {
+                if (value != forOwnerType)
+                {
+                    EjectAll();
+                    forOwnerType = value;
+                    cachedTopGraphic = null;
+                    //Notify_ColorChanged();
+                    NotifyRoomBedTypeChanged();
+                }
+            }
+        }
+
+        private BedOwnerType forOwnerType;
+        public bool ForPrisoners
+        {
+            get
+            {
+                return forOwnerType == BedOwnerType.Prisoner;
+            }
+            set
+            {
+                if (value == ForPrisoners)
+                {
+                    return;
+                }
+                if (Current.ProgramState != ProgramState.Playing && Scribe.mode != 0)
+                {
+                    Log.Error("TSS: Tried to set ForPrisoners while game mode was " + Current.ProgramState);
+                    return;
+                }
+                EjectAll();
+                if (value)
+                {
+                    forOwnerType = BedOwnerType.Prisoner;
+                }
+                else
+                {
+                    forOwnerType = BedOwnerType.Colonist;
+                    Log.Error("Bed ForPrisoners=false, but should it be for for colonists or slaves?  Set ForOwnerType instead.");
+                }
+                cachedTopGraphic = null;
+                //Notify_ColorChanged();
+                NotifyRoomBedTypeChanged();
+            }
+        }
+
+        private void NotifyRoomBedTypeChanged()
+        {
+            this.GetRoom()?.Notify_BedTypeChanged();
+        }
+
+        private static int lastBedOwnerSetChangeFrame = -1;
+        public void SetBedOwnerTypeByInterface(BedOwnerType ownerType)
+        {
+            if (lastBedOwnerSetChangeFrame == Time.frameCount) {
+                return;
+            }
+            lastBedOwnerSetChangeFrame = Time.frameCount;
+
+            ((ForOwnerType != ownerType) ? SoundDefOf.Checkbox_TurnedOn : SoundDefOf.Checkbox_TurnedOff).PlayOneShotOnCamera();
+            ForOwnerType = ownerType;
+        }
+
+        // </forOwnerType>
+        ///////////////////////////////////////////////////////////////////////////////////////////
+
         public override void PostMake()
         {
             base.PostMake();
@@ -57,6 +133,12 @@ namespace zed_0xff.CPS
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
             base.SpawnSetup(map, respawningAfterLoad);
+
+            // from Building_Bed
+            Region validRegionAt_NoRebuild = map.regionGrid.GetValidRegionAt_NoRebuild(base.Position);
+            if (validRegionAt_NoRebuild != null && validRegionAt_NoRebuild.Room.IsPrisonCell) {
+                ForPrisoners = true;
+            }
 
             restEffectiveness = 
                 def.statBases.StatListContains(StatDefOf.BedRestEffectiveness)
@@ -78,20 +160,6 @@ namespace zed_0xff.CPS
         {
             sustainerWorking = null;
             base.DeSpawn(mode);
-        }
-
-        public override void ExposeData()
-        {
-            base.ExposeData();
-            Scribe_Deep.Look(ref allowedNutritionSettings, "allowedNutritionSettings");
-            if (allowedNutritionSettings == null)
-            {
-                allowedNutritionSettings = new StorageSettings(this);
-                if (def.building.defaultStorageSettings != null)
-                {
-                    allowedNutritionSettings.CopyFrom(def.building.defaultStorageSettings);
-                }
-            }
         }
 
         public float NutritionNeeded
@@ -153,6 +221,12 @@ namespace zed_0xff.CPS
             {
                 return "NoPower".Translate().CapitalizeFirst();
             }
+            if( ForPrisoners && !pawn.IsPrisonerOfColony ){
+                return "ForPrisonerUse".Translate().CapitalizeFirst();
+            }
+            if( !ForPrisoners && pawn.IsPrisonerOfColony ){
+                return "ForColonistUse".Translate().CapitalizeFirst();
+            }
             return pawn.IsColonist && !pawn.IsQuestLodger();
         }
 
@@ -187,15 +261,15 @@ namespace zed_0xff.CPS
         [Unsaved(false)]
         private Graphic cachedTopGraphic;
 
-        private Graphic TopGraphic
-        {
+        private Graphic TopGraphic {
             get
             {
                 if (cachedTopGraphic == null || Prefs.DevMode )
                 {
-                    // TODO: prisoners color
                     cachedTopGraphic = GraphicDatabase.Get<Graphic_Multi>("Things/Building/Misc/GrowthVat/GrowthVatTop",
-                            ShaderDatabase.Transparent, new Vector2(1.2f,2.3f), TopColorNormal);
+                            ShaderDatabase.Transparent,
+                            new Vector2(1.2f,2.3f),
+                            ForPrisoners ? TopColorPrisoner : TopColorNormal );
                 }
                 return cachedTopGraphic;
             }
@@ -216,13 +290,16 @@ namespace zed_0xff.CPS
                 int i = 0;
                 foreach( Pawn pawn in topPawns ){
                     pawn.Drawer.renderer.RenderPawnAt(DrawPos + PawnDrawOffsets[i], null, neverAimWeapon: true);
-                    TopGraphic.Draw(DrawPos + PawnDrawOffsets[i] + Altitudes.AltIncVect * 2f, base.Rotation, this);
                     i++;
                     if( i == 4 ){
                         // should not be here, just in case
                         break;
                     }
                 }
+            }
+
+            for( int i=0; i<4; i++ ){
+                TopGraphic.Draw(DrawPos + PawnDrawOffsets[i] + Altitudes.AltIncVect * 2f, base.Rotation, this);
             }
         }
 
@@ -235,14 +312,32 @@ namespace zed_0xff.CPS
             }
         }
 
-        // TODO: disable hospitality?
         public override IEnumerable<Gizmo> GetGizmos()
         {
-            foreach (var gizmo in base.GetGizmos())
-            {
-                //Log.Warning("[d] " + gizmo);
+            foreach (var gizmo in base.GetGizmos()) {
                 yield return gizmo;
             }
+            if (base.Faction != Faction.OfPlayer) {
+                yield break;
+            }
+
+            Command_Toggle command_Toggle = new Command_Toggle();
+            command_Toggle.defaultLabel = "CommandBedSetForPrisonersLabel".Translate();
+            command_Toggle.defaultDesc = "CommandBedSetForPrisonersDesc".Translate();
+            command_Toggle.icon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
+            command_Toggle.isActive = () => ForPrisoners;
+            command_Toggle.toggleAction = delegate
+            {
+                SetBedOwnerTypeByInterface((!ForPrisoners) ? BedOwnerType.Prisoner : BedOwnerType.Colonist);
+            };
+//            if (!RoomCanBePrisonCell(this.GetRoom()) && !ForPrisoners)
+//            {
+//                command_Toggle.Disable("CommandBedSetForPrisonersFailOutdoors".Translate());
+//            }
+            command_Toggle.hotKey = KeyBindingDefOf.Misc3;
+            command_Toggle.turnOffSound = null;
+            command_Toggle.turnOnSound = null;
+            yield return command_Toggle;
         }
 
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)
@@ -490,6 +585,7 @@ namespace zed_0xff.CPS
                 rotate();
 
             if( PowerOn ){
+                ticksWithoutPower = 0;
                 feedOccupants();
 
                 if (this.IsHashIntervalTick(2500)) {
@@ -504,14 +600,37 @@ namespace zed_0xff.CPS
             } else {
                 ticksWithoutPower++;
                 if( ticksWithoutPower >= 999 ){ // TODO
-                    EjectContents();
+                    EjectAll();
                 }
             }
             //base.TickRare(); // don't call base because we call TickRare() from Tick() ourselves (questionable)
         }
 
-        void EjectContents(){
-            // TODO?
+        void EjectAll(){
+            Thing lastResultingThing;
+            List<Thing> things = new List<Thing>( innerContainer ); // original list will be modified in process
+            foreach( Thing t in things ){
+                if( t is Pawn ){
+                    innerContainer.TryDrop(t, InteractionCell, Map, ThingPlaceMode.Near, out lastResultingThing);
+                }
+            }
+            topPawns = null;
         }
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Deep.Look(ref allowedNutritionSettings, "allowedNutritionSettings");
+            Scribe_Values.Look(ref forOwnerType, "forOwnerType", BedOwnerType.Colonist);
+            if (allowedNutritionSettings == null)
+            {
+                allowedNutritionSettings = new StorageSettings(this);
+                if (def.building.defaultStorageSettings != null)
+                {
+                    allowedNutritionSettings.CopyFrom(def.building.defaultStorageSettings);
+                }
+            }
+        }
+
     }
 }
