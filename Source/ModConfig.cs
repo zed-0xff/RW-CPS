@@ -25,23 +25,17 @@ namespace zed_0xff.CPS
             }
         };
 
-        public class GeneralSettings {
+        public class CommonSettings {
             public float maxFillRate = 0.8f;
             public bool debugLog = false;
-
-            public float cr, cg, cb, ca;
 
             public virtual void ExposeData(){
                 Scribe_Values.Look(ref maxFillRate, "maxFillRate", 0.8f);
                 Scribe_Values.Look(ref debugLog, "debugLog", false);
-                Scribe_Values.Look(ref cr, "cr", 1.0f);
-                Scribe_Values.Look(ref cg, "cg", 1.0f);
-                Scribe_Values.Look(ref cb, "cb", 1.0f);
-                Scribe_Values.Look(ref ca, "ca", 1.0f);
             }
         }
 
-        public GeneralSettings general = new GeneralSettings();
+        public CommonSettings general = new CommonSettings();
         public TypeSettings colonists = new TypeSettings(0.9f);
         public TypeSettings prisoners = new TypeSettings();
         public TypeSettings slaves = new TypeSettings();
@@ -67,23 +61,22 @@ namespace zed_0xff.CPS
             Settings = GetSettings<CPSSettings>();
         }
 
-        private void drawBlock(Listing_Standard l, string title, ref CPSSettings.GeneralSettings s){
+        private void drawBlock(Listing_Standard l, string title, ref CPSSettings.CommonSettings s){
+            Text.Font = GameFont.Medium;
             l.Label(title);
+            Text.Font = GameFont.Small;
             l.GapLine();
 
-            l.Label("Stop drawing if storage is " + Math.Round(s.maxFillRate*100) + "% full");
+            l.Label("Stop drawing blood if storage is " + Math.Round(s.maxFillRate*100) + "% full");
             s.maxFillRate = l.Slider(s.maxFillRate, 0.1f, 1.0f);
-
-            s.cr = l.Slider(s.cr, 0, 1.0f);
-            s.cg = l.Slider(s.cg, 0, 1.0f);
-            s.cb = l.Slider(s.cb, 0, 1.0f);
-            s.ca = l.Slider(s.ca, 0, 1.0f);
 
             l.Gap();
         }
 
         private void drawBlock(Listing_Standard l, string title, ref CPSSettings.TypeSettings s){
+            Text.Font = GameFont.Medium;
             l.Label(title);
+            Text.Font = GameFont.Small;
             l.GapLine();
 
             if( title == "Prisoners" ){
@@ -102,30 +95,49 @@ namespace zed_0xff.CPS
         }
 
         private static Vector2 scrollPosition = Vector2.zero;
+        private int PageIndex = 0;
 
         public override void DoSettingsWindowContents(Rect inRect)
         {
+            var tabRect = new Rect(inRect) {
+                y = inRect.y + 40f
+            };
+            var mainRect = new Rect(inRect) {
+                height = inRect.height - 40f,
+                y = inRect.y + 40f
+            };
+
+            Widgets.DrawMenuSection(mainRect);
+
+            var tabs = new List<TabRecord>
+            {
+                new TabRecord("TSS".Translate(), () =>
+                {
+                    PageIndex = 0;
+                    WriteSettings();
+
+                }, PageIndex == 0),
+            };
+
+            TabDrawer.DrawTabs(tabRect, tabs);
+
+            switch (PageIndex)
+            {
+                case 0:
+                    TSS_Settings(mainRect.ContractedBy(15f));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void TSS_Settings(Rect inRect){
             Listing_Standard l = new Listing_Standard();
+            var viewRect = new Rect(0f, 0f, inRect.width - 60, 1000f); // XXX manual height :(
+            Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
+            l.Begin(viewRect);
 
-            var scrollContainer = inRect.ContractedBy(10);
-            scrollContainer.height -= l.CurHeight;
-            scrollContainer.y += l.CurHeight;
-            Widgets.DrawBoxSolid(scrollContainer, Color.grey);
-            var innerContainer = scrollContainer.ContractedBy(1);
-            Widgets.DrawBoxSolid(innerContainer, new ColorInt(42, 43, 44).ToColor);
-            var frameRect = innerContainer.ContractedBy(5);
-            frameRect.y += 15;
-            frameRect.height -= 15;
-            var contentRect = frameRect;
-            contentRect.x = 0;
-            contentRect.y = 0;
-            contentRect.width -= 20;
-            contentRect.height = 950f;
-
-            Widgets.BeginScrollView(frameRect, ref scrollPosition, contentRect, true);
-            l.Begin(contentRect.AtZero());
-
-            drawBlock(l, "General", ref Settings.general);
+            drawBlock(l, "Common", ref Settings.general);
             drawBlock(l, "Prisoners", ref Settings.prisoners);
             drawBlock(l, "Colonists", ref Settings.colonists);
             drawBlock(l, "Slaves", ref Settings.slaves);
@@ -136,7 +148,6 @@ namespace zed_0xff.CPS
 
             l.End();
             Widgets.EndScrollView();
-            base.DoSettingsWindowContents(inRect);
         }
 
         public override string SettingsCategory() => "CPS";
