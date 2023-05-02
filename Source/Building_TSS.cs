@@ -213,6 +213,14 @@ namespace zed_0xff.CPS
 
         public override AcceptanceReport CanAcceptPawn(Pawn pawn)
         {
+            if (!pawn.IsColonist && !pawn.IsSlaveOfColony && !pawn.IsPrisonerOfColony)
+            {
+                return false;
+            }
+            if (!pawn.RaceProps.Humanlike || pawn.IsQuestLodger())
+            {
+                return false;
+            }
             if (nPawns >= MaxSlots)
             {
                 return "Occupied".Translate();
@@ -227,24 +235,20 @@ namespace zed_0xff.CPS
             if( !ForPrisoners && pawn.IsPrisonerOfColony ){
                 return "ForColonistUse".Translate().CapitalizeFirst();
             }
-            return pawn.IsColonist && !pawn.IsQuestLodger();
+            return true;
         }
 
         public override void TryAcceptPawn(Pawn pawn)
         {
-            if (selectedPawn == null || !CanAcceptPawn(pawn))
-            {
+            if ( !CanAcceptPawn(pawn) ) {
                 return;
             }
-            selectedPawn = pawn;
+            selectedPawn = null;
             bool num = pawn.DeSpawnOrDeselect();
-            if (innerContainer.TryAddOrTransfer(pawn))
-            {
+            if (innerContainer.TryAddOrTransfer(pawn)) {
                 SoundDefOf.GrowthVat_Close.PlayOneShot(SoundInfo.InMap(this));
-                //startTick = Find.TickManager.TicksGame;
             }
-            if (num)
-            {
+            if (num) {
                 Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);
             }
         }
@@ -312,6 +316,18 @@ namespace zed_0xff.CPS
             }
         }
 
+        [Unsaved(false)]
+        private Texture2D cachedInsertPawnTex;
+
+        public Texture2D InsertPawnTex {
+            get {
+                if (cachedInsertPawnTex == null) {
+                    cachedInsertPawnTex = ContentFinder<Texture2D>.Get("UI/Gizmos/InsertPawn");
+                }
+                return cachedInsertPawnTex;
+            }
+        }
+
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var gizmo in base.GetGizmos()) {
@@ -321,23 +337,53 @@ namespace zed_0xff.CPS
                 yield break;
             }
 
-            Command_Toggle command_Toggle = new Command_Toggle();
-            command_Toggle.defaultLabel = "CommandBedSetForPrisonersLabel".Translate();
-            command_Toggle.defaultDesc = "CommandBedSetForPrisonersDesc".Translate();
-            command_Toggle.icon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
-            command_Toggle.isActive = () => ForPrisoners;
-            command_Toggle.toggleAction = delegate
             {
-                SetBedOwnerTypeByInterface((!ForPrisoners) ? BedOwnerType.Prisoner : BedOwnerType.Colonist);
-            };
-//            if (!RoomCanBePrisonCell(this.GetRoom()) && !ForPrisoners)
-//            {
-//                command_Toggle.Disable("CommandBedSetForPrisonersFailOutdoors".Translate());
-//            }
-            command_Toggle.hotKey = KeyBindingDefOf.Misc3;
-            command_Toggle.turnOffSound = null;
-            command_Toggle.turnOnSound = null;
-            yield return command_Toggle;
+                Command_Toggle ct = new Command_Toggle();
+                ct.defaultLabel = "CommandBedSetForPrisonersLabel".Translate();
+                ct.defaultDesc = "CommandBedSetForPrisonersDesc".Translate();
+                ct.icon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
+                ct.isActive = () => ForPrisoners;
+                ct.toggleAction = delegate
+                {
+                    SetBedOwnerTypeByInterface((!ForPrisoners) ? BedOwnerType.Prisoner : BedOwnerType.Colonist);
+                };
+                //            if (!RoomCanBePrisonCell(this.GetRoom()) && !ForPrisoners)
+                //            {
+                //                ct.Disable("CommandBedSetForPrisonersFailOutdoors".Translate());
+                //            }
+                ct.hotKey = KeyBindingDefOf.Misc3;
+                ct.turnOffSound = null;
+                ct.turnOnSound = null;
+                yield return ct;
+            }
+
+            {
+                Command_Action ca = new Command_Action();
+                ca.defaultLabel = "InsertPerson".Translate() + "...";
+                ca.icon = InsertPawnTex;
+                ca.action = delegate
+                {
+                    List<FloatMenuOption> list = new List<FloatMenuOption>();
+                    foreach (Pawn item in base.Map.mapPawns.AllPawnsSpawned)
+                    {
+                        Pawn pawn = item;
+                        AcceptanceReport acceptanceReport = CanAcceptPawn(pawn);
+                        string text = pawn.LabelShortCap;
+                        if (acceptanceReport.Accepted) {
+                            list.Add(new FloatMenuOption(text, delegate { SelectPawn(pawn); }, pawn, Color.white));
+                        }
+                    }
+                    if (!list.Any()) {
+                        list.Add(new FloatMenuOption("NoViablePawns".Translate(), null)); // Biotech
+                    }
+                    Find.WindowStack.Add(new FloatMenu(list));
+                };
+                if (!PowerOn)
+                {
+                    ca.Disable("NoPower".Translate().CapitalizeFirst());
+                }
+                yield return ca;
+            }
         }
 
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)
@@ -370,6 +416,39 @@ namespace zed_0xff.CPS
             {
                 yield return new FloatMenuOption("CannotEnterBuilding".Translate(this) + ": " + acceptanceReport.Reason.CapitalizeFirst(), null);
             }
+        }
+
+        private static List<Pawn> tmpQueuedPawns = new List<Pawn>();
+
+        // called only if multiple _colonists_ are selected
+        // selected prisoners are just ignored
+        public override IEnumerable<FloatMenuOption> GetMultiSelectFloatMenuOptions(List<Pawn> selPawns)
+        {
+            foreach( Pawn p in selPawns ){
+                AcceptanceReport acceptanceReport = CanAcceptPawn(p);
+                if( !acceptanceReport.Accepted ){
+                    if( !acceptanceReport.Reason.NullOrEmpty() ){
+                        yield return new FloatMenuOption("CannotEnterBuilding".Translate(this) + ": " + acceptanceReport.Reason.CapitalizeFirst(), null);
+                    }
+                    yield break;
+                }
+            }
+            if( nPawns + selPawns.Count > MaxSlots ){
+                var reason = "Occupied".Translate();
+                yield return new FloatMenuOption("CannotEnterBuilding".Translate(this) + ": " + reason.CapitalizeFirst(), null);
+                yield break;
+            }
+
+            tmpQueuedPawns.Clear();
+            tmpQueuedPawns.AddRange(selPawns);
+
+            yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate {
+                    // selPawns list is empty here
+                    foreach( Pawn p in tmpQueuedPawns ){
+                        p.jobs.TryTakeOrderedJob(JobMaker.MakeJob(JobDefOf.EnterBuilding, this), JobTag.Misc);
+                    }
+                    tmpQueuedPawns.Clear();
+                    });
         }
 
         public float NutritionConsumedPerDay
@@ -420,6 +499,9 @@ namespace zed_0xff.CPS
             } else {
                 stringBuilder.AppendLineIfNotEmpty().Append("Nutrition".Translate()).Append(": ")
                     .Append(NutritionStored.ToStringByStyle(ToStringStyle.FloatMaxOne));
+            }
+            if( Prefs.DevMode ){
+                stringBuilder.AppendLineIfNotEmpty().Append("Ticks without power: " + ticksWithoutPower);
             }
             return stringBuilder.ToString();
         }
@@ -552,10 +634,17 @@ namespace zed_0xff.CPS
                     } else {
                         sustainerWorking.Maintain();
                     }
+                    int np = 0;
                     foreach( Thing t in innerContainer ) {
                         if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
+                            np++;
                             pawn.needs.rest.TickResting(restEffectiveness);
                         }
+                    }
+                    if( np != nPawns ){
+                        // someone was ejected
+                        topPawns = null;
+                        nPawns = np;
                     }
                 }
             }
@@ -598,8 +687,8 @@ namespace zed_0xff.CPS
                     }
                 }
             } else {
-                ticksWithoutPower++;
-                if( ticksWithoutPower >= 999 ){ // TODO
+                ticksWithoutPower += 250; // XXX wrong to assume we had 250 ticks since last call
+                if( ticksWithoutPower >= 10000 ){ // 4 ingame hours, ~3 minutes IRL
                     EjectAll();
                 }
             }
@@ -615,6 +704,8 @@ namespace zed_0xff.CPS
                 }
             }
             topPawns = null;
+            nPawns = 0;
+            selectedPawn = null;
         }
 
         public override void ExposeData()
@@ -622,6 +713,7 @@ namespace zed_0xff.CPS
             base.ExposeData();
             Scribe_Deep.Look(ref allowedNutritionSettings, "allowedNutritionSettings");
             Scribe_Values.Look(ref forOwnerType, "forOwnerType", BedOwnerType.Colonist);
+            Scribe_Values.Look(ref ticksWithoutPower, "ticksWithoutPower", 0);
             if (allowedNutritionSettings == null)
             {
                 allowedNutritionSettings = new StorageSettings(this);

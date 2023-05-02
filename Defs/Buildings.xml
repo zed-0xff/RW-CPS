@@ -216,10 +216,10 @@
     <fillPercent>0.8</fillPercent>
     <drawGUIOverlay>true</drawGUIOverlay>
     <comps>
-      <li Class="CompProperties_AssignableToPawn">
+      <!--li Class="CompProperties_AssignableToPawn">
         <drawAssignmentOverlay>false</drawAssignmentOverlay>
         <compClass>CompAssignableToPawn</compClass>
-      </li>
+      </li-->
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
         <basePowerConsumption>1024</basePowerConsumption>
