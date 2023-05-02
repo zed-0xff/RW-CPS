@@ -10,5 +10,8 @@ namespace zed_0xff.CPS
 
         public static ThoughtDef NeedBeauty;
         public static ThoughtDef NeedRoomSize;
+
+        public static JobDef EnterMultiBuilding;
+        public static JobDef CarryToMultiBuilding;
     }
 }

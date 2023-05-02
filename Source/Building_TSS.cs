@@ -11,7 +11,7 @@ using Verse.Sound;
 
 namespace zed_0xff.CPS
 {
-    public class Building_TSS : Building_Enterable, IStoreSettingsParent, IThingHolderWithDrawnPawn {
+    public class Building_TSS : Building_MultiEnterable, IStoreSettingsParent, IThingHolderWithDrawnPawn {
         public /*override*/ int MaxSlots => 16;
 
         private int ticksWithoutPower = 0;
@@ -247,6 +247,7 @@ namespace zed_0xff.CPS
             bool num = pawn.DeSpawnOrDeselect();
             if (innerContainer.TryAddOrTransfer(pawn)) {
                 SoundDefOf.GrowthVat_Close.PlayOneShot(SoundInfo.InMap(this));
+                SelectedPawns.Remove(pawn); // or don't remove?
             }
             if (num) {
                 Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);
@@ -400,17 +401,13 @@ namespace zed_0xff.CPS
             AcceptanceReport acceptanceReport = CanAcceptPawn(selPawn);
             if (acceptanceReport.Accepted)
             {
-                yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption("EnterBuilding".Translate(this), delegate
-                            {
-                            SelectPawn(selPawn);
-                            }), selPawn, this);
+                yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate { SelectPawn(selPawn); });
             }
-            else if (base.SelectedPawn == selPawn && !selPawn.IsPrisonerOfColony)
+            else if (SelectedPawns.Contains(selPawn) && !selPawn.IsPrisonerOfColony)
             {
-                yield return FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption("EnterBuilding".Translate(this), delegate
-                            {
-                            selPawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(JobDefOf.EnterBuilding, this), JobTag.Misc);
-                            }), selPawn, this);
+                yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate {
+                        selPawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VThingDefOf.EnterMultiBuilding, this), JobTag.Misc);
+                        });
             }
             else if (!acceptanceReport.Reason.NullOrEmpty())
             {
@@ -445,7 +442,7 @@ namespace zed_0xff.CPS
             yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate {
                     // selPawns list is empty here
                     foreach( Pawn p in tmpQueuedPawns ){
-                        p.jobs.TryTakeOrderedJob(JobMaker.MakeJob(JobDefOf.EnterBuilding, this), JobTag.Misc);
+                        p.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VThingDefOf.EnterMultiBuilding, this), JobTag.Misc);
                     }
                     tmpQueuedPawns.Clear();
                     });
@@ -706,6 +703,7 @@ namespace zed_0xff.CPS
             topPawns = null;
             nPawns = 0;
             selectedPawn = null;
+            SelectedPawns.Clear();
         }
 
         public override void ExposeData()
