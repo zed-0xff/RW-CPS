@@ -169,11 +169,13 @@
       <Mass>1200</Mass>
       <Flammability>1.0</Flammability>
       <Beauty>-10</Beauty>
+      <Comfort>0.5</Comfort>
+      <BedRestEffectiveness>0.8</BedRestEffectiveness>
     </statBases>
     <!--passability>PassThroughOnly</passability-->
     <passability>Impassable</passability>
     <hasInteractionCell>true</hasInteractionCell>
-    <interactionCellOffset>(1, 0, 2)</interactionCellOffset>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
     <pathCost>42</pathCost>
     <building>
       <destroySound>BuildingDestroyed_Metal_Big</destroySound>

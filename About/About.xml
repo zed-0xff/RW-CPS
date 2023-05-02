@@ -11,6 +11,11 @@
 Cabin:
   + soundproof
 
+TSS:
+  + has built-in nutrient paste producer for feeding occupants
+  + optionally connects to VNPE network (as a consumer)
+  + maintains comfortable inside temperature
+
 [url=https://ko-fi.com/K3K81Z3W5][img]https://i.imgur.com/Utx6OIH.png[/img][/url]
 </description>
   <modDependencies>

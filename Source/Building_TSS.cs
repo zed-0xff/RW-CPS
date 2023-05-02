@@ -23,6 +23,9 @@ namespace zed_0xff.CPS
 
         private const float BasePawnConsumedNutritionPerDay = 1.6f;
         public const float NutritionBuffer = BasePawnConsumedNutritionPerDay * 10; // should be MaxSlots here?
+        public float restEffectiveness = StatDefOf.BedRestEffectiveness.valueIfMissing;
+        public float comfort = 0;
+        public float beauty = 0;
 
         [Unsaved(false)]
         private CompPowerTrader cachedPowerComp;
@@ -49,6 +52,26 @@ namespace zed_0xff.CPS
             {
                 allowedNutritionSettings.CopyFrom(def.building.defaultStorageSettings);
             }
+        }
+
+        public override void SpawnSetup(Map map, bool respawningAfterLoad)
+        {
+            base.SpawnSetup(map, respawningAfterLoad);
+
+            restEffectiveness = 
+                def.statBases.StatListContains(StatDefOf.BedRestEffectiveness)
+                ? this.GetStatValue(StatDefOf.BedRestEffectiveness) 
+                : StatDefOf.BedRestEffectiveness.valueIfMissing;
+
+            comfort = 
+                def.statBases.StatListContains(StatDefOf.Comfort)
+                ? this.GetStatValue(StatDefOf.Comfort) 
+                : StatDefOf.Comfort.valueIfMissing;
+
+            beauty = 
+                def.statBases.StatListContains(StatDefOf.Beauty)
+                ? this.GetStatValue(StatDefOf.Beauty) 
+                : StatDefOf.Beauty.valueIfMissing;
         }
 
         public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
@@ -144,15 +167,7 @@ namespace zed_0xff.CPS
             if (innerContainer.TryAddOrTransfer(pawn))
             {
                 SoundDefOf.GrowthVat_Close.PlayOneShot(SoundInfo.InMap(this));
-                startTick = Find.TickManager.TicksGame;
-                if (!pawn.health.hediffSet.HasHediff(HediffDefOf.VatLearning))
-                {
-                    pawn.health.AddHediff(HediffDefOf.VatLearning);
-                }
-                if (!pawn.health.hediffSet.HasHediff(HediffDefOf.VatGrowing))
-                {
-                    pawn.health.AddHediff(HediffDefOf.VatGrowing);
-                }
+                //startTick = Find.TickManager.TicksGame;
             }
             if (num)
             {
@@ -324,27 +339,6 @@ namespace zed_0xff.CPS
         // </Sound>
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        // 1. play sound (does not play if called in rare tick)
-        // 2. tick contained pawns
-        // 3. call TickRare()
-        public override void Tick()
-        {
-            if( PowerOn ){
-                if ( nPawns > 0 ){
-                    if (sustainerWorking == null || sustainerWorking.Ended) {
-                        sustainerWorking = SoundDefOf.GeneExtractor_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
-                    } else {
-                        sustainerWorking.Maintain();
-                    }
-                }
-            }
-            base.Tick();
-            innerContainer.ThingOwnerTick();
-            if (this.IsHashIntervalTick(250)) {
-                TickRare();
-            }
-        }
-
         private void rotate(){
            if ( topPawns == null ){
                topPawns = new List<Pawn>();
@@ -450,8 +444,36 @@ namespace zed_0xff.CPS
         // </feeding>
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        // 0. count pawns
-        // 1. temperature control
+        // 1. play sound (does not play if called in rare tick)
+        // 2. tick contained pawns
+        // 3. make them rest
+        // 4. call TickRare()
+        public override void Tick()
+        {
+            if( PowerOn ){
+                if ( nPawns > 0 ){
+                    if (sustainerWorking == null || sustainerWorking.Ended) {
+                        sustainerWorking = SoundDefOf.GeneExtractor_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
+                    } else {
+                        sustainerWorking.Maintain();
+                    }
+                    foreach( Thing t in innerContainer ) {
+                        if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
+                            pawn.needs.rest.TickResting(restEffectiveness);
+                        }
+                    }
+                }
+            }
+            base.Tick();
+
+            innerContainer.ThingOwnerTick();
+
+            if (this.IsHashIntervalTick(250) || topPawns == null) {
+                TickRare();
+            }
+        }
+
+        // 1. count pawns
         // 2. eject all on power failure check
         // 3. rotate pawns
         // 4. feed pawns
@@ -459,8 +481,9 @@ namespace zed_0xff.CPS
         {
             nPawns = 0;
             foreach( Thing t in innerContainer ){
-                if( t is Pawn )
+                if( t is Pawn pawn ){
                     nPawns++;
+                }
             }
 
             if( topPawns == null )
@@ -472,10 +495,10 @@ namespace zed_0xff.CPS
                 if (this.IsHashIntervalTick(2500)) {
                     rotate();
                 }
-//                this.GetRoom().Temperature = 21;
                 foreach( Thing t in innerContainer ){
-                    if( t is Pawn pawn ){
+                    if( t is Pawn pawn && !pawn.Dead ){
                         pawn.health.AddHediff(HediffDefOf.CryptosleepSickness);
+                        pawn.needs?.mood?.thoughts?.memories?.RemoveMemoriesOfDef(ThoughtDefOf.SleptOutside);
                     }
                 }
             } else {
@@ -484,11 +507,11 @@ namespace zed_0xff.CPS
                     EjectContents();
                 }
             }
-            base.TickRare();
+            //base.TickRare(); // don't call base because we call TickRare() from Tick() ourselves (questionable)
         }
 
         void EjectContents(){
-            // TODO
+            // TODO?
         }
     }
 }
