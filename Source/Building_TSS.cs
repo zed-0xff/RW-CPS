@@ -324,6 +324,7 @@ namespace zed_0xff.CPS
 
         public override IEnumerable<Gizmo> GetGizmos()
         {
+            tmpQueuedPawns.Clear();
             foreach (var gizmo in base.GetGizmos()) {
                 yield return gizmo;
             }
@@ -404,6 +405,7 @@ namespace zed_0xff.CPS
 
         public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)
         {
+            tmpQueuedPawns.Clear();
             foreach (FloatMenuOption floatMenuOption in base.GetFloatMenuOptions(selPawn))
             {
                 yield return floatMenuOption;
@@ -430,12 +432,14 @@ namespace zed_0xff.CPS
             }
         }
 
+        // only needed between a call to GetMultiSelectFloatMenuOptions() and a click on popped-up item
         private static List<Pawn> tmpQueuedPawns = new List<Pawn>();
 
         // called only if multiple _colonists_ are selected
         // selected prisoners are just ignored
         public override IEnumerable<FloatMenuOption> GetMultiSelectFloatMenuOptions(List<Pawn> selPawns)
         {
+            tmpQueuedPawns.Clear();
             foreach( Pawn p in selPawns ){
                 AcceptanceReport acceptanceReport = CanAcceptPawn(p);
                 if( !acceptanceReport.Accepted ){
@@ -451,7 +455,6 @@ namespace zed_0xff.CPS
                 yield break;
             }
 
-            tmpQueuedPawns.Clear();
             tmpQueuedPawns.AddRange(selPawns);
 
             yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate {
