@@ -5,33 +5,32 @@ using RimWorld;
 using Verse;
 using UnityEngine;
 
-namespace zed_0xff.CPS
+namespace zed_0xff.CPS;
+
+public class ITab_Contents_TSS : ITab_ContentsBase
 {
-    public class ITab_Contents_TSS : ITab_ContentsBase
+    private List<Thing> listInt = new List<Thing>();
+
+    public override bool UseDiscardMessage => false;
+
+    public override IList<Thing> container
     {
-        private List<Thing> listInt = new List<Thing>();
-
-        public override bool UseDiscardMessage => false;
-
-        public override IList<Thing> container
+        get
         {
-            get
+            Building_TSS b = base.SelThing as Building_TSS;
+            listInt.Clear();
+            if (b != null && b.innerContainer != null)
             {
-                Building_TSS b = base.SelThing as Building_TSS;
-                listInt.Clear();
-                if (b != null && b.innerContainer != null)
-                {
-                    listInt.AddRange(b.innerContainer);
-                }
-                return listInt;
+                listInt.AddRange(b.innerContainer);
             }
+            return listInt;
         }
+    }
 
-        public ITab_Contents_TSS()
-        {
-            labelKey = "Contents";
-            containedItemsKey = "Contents";
-            canRemoveThings = true;
-        }
+    public ITab_Contents_TSS()
+    {
+        labelKey = "Contents";
+        containedItemsKey = "Contents";
+        canRemoveThings = true;
     }
 }

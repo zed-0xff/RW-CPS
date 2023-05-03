@@ -7,17 +7,16 @@ using UnityEngine;
 using Verse;
 using Verse.AI;
 
-namespace zed_0xff.CPS
+namespace zed_0xff.CPS;
+
+[HarmonyPatch(typeof(RegionAndRoomQuery), nameof(RegionAndRoomQuery.GetDistrict))]
+static class Patch_GetDistrict
 {
-    [HarmonyPatch(typeof(RegionAndRoomQuery), nameof(RegionAndRoomQuery.GetDistrict))]
-    static class Patch_GetDistrict
+    // fix base NullReferenceException in Building_Bed.DeSpawn() when CPS is a room for itself 
+    public static void Postfix(this Thing thing, ref District __result)
     {
-        // fix base NullReferenceException in Building_Bed.DeSpawn() when CPS is a room for itself 
-        public static void Postfix(this Thing thing, ref District __result)
-        {
-            if( thing is Building_Base b && b.IsDespawning ){
-                __result = null;
-            }
+        if( thing is Building_Base b && b.IsDespawning ){
+            __result = null;
         }
     }
 }
