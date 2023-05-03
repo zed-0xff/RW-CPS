@@ -387,9 +387,13 @@ namespace zed_0xff.CPS
                 c.activateSound = SoundDefOf.Designate_Cancel;
                 c.action = delegate
                 {
-                    foreach( Pawn p in selectedPawns ){
+                    List<Pawn> pawns = new List<Pawn>();
+                    pawns.AddRange(selectedPawns);
+                    foreach( Pawn p in pawns ){
                         if( p.CurJobDef == VThingDefOf.EnterMultiBuilding ){
                             p.jobs.EndCurrentJob(JobCondition.InterruptForced);
+                        } else if ( p.CarriedBy != null && p.CarriedBy.CurJobDef == VThingDefOf.CarryToMultiBuilding ) {
+                            p.CarriedBy.jobs.EndCurrentJob(JobCondition.InterruptForced);
                         }
                     }
                     SelectedPawns.Clear();

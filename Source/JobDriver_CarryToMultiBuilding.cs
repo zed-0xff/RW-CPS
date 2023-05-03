@@ -24,14 +24,11 @@ namespace zed_0xff.CPS
         {
             this.FailOnDestroyedOrNull(TargetIndex.B);
             this.FailOnDespawnedNullOrForbidden(TargetIndex.A);
-            this.FailOn(() => !Building.CanAcceptPawn(Takee));
+            this.FailOn(() => !Building.CanAcceptPawn(Takee) || !Building.SelectedPawns.Contains(Takee));
+            // for proper canceling of a pending job -----------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
             yield return Toils_General.Do(delegate
                     {
                     Building.SelectedPawns.Add(Takee);
-                    });
-            AddFinishAction(delegate
-                    {
-                    Building.SelectedPawns.Remove(Takee); // will be called on job cancel too
                     });
             yield return Toils_Goto.GotoThing(TargetIndex.B, PathEndMode.OnCell);
             yield return Toils_Haul.StartCarryThing(TargetIndex.B);
