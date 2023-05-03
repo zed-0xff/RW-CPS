@@ -11,7 +11,7 @@ namespace zed_0xff.CPS {
     {
         static void Postfix(ref bool __result, Pawn pawn, ThoughtDef def){
             if( __result ) return;
-            if( def != VThingDefOf.NeedRoomSize && def != VThingDefOf.NeedBeauty ) return;
+            if( def != VDefOf.NeedRoomSize && def != VDefOf.NeedBeauty ) return;
             if( !(pawn.ParentHolder is Building_TSS) ) return;
 
             __result = true;

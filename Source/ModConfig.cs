@@ -141,7 +141,7 @@ namespace zed_0xff.CPS
             drawBlock(l, "Prisoners", ref Settings.prisoners);
             drawBlock(l, "Colonists", ref Settings.colonists);
             drawBlock(l, "Slaves", ref Settings.slaves);
-            drawBlock(l, "Others", ref Settings.others);
+//            drawBlock(l, "Others", ref Settings.others);
 
             l.Label("(*) one hemogen pack adds 35% so it will not be exact amount");
             l.Label("(**) prisoner interaction type should be set to \"Hemogen farm\"");

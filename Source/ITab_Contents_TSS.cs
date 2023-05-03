@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace zed_0xff.CPS
 {
-    public class ITab_ContentsTSS : ITab_ContentsBase
+    public class ITab_Contents_TSS : ITab_ContentsBase
     {
         private List<Thing> listInt = new List<Thing>();
 
@@ -27,10 +27,10 @@ namespace zed_0xff.CPS
             }
         }
 
-        public ITab_ContentsTSS()
+        public ITab_Contents_TSS()
         {
-            labelKey = "TabCasketContents";
-            containedItemsKey = "ContainedItems";
+            labelKey = "Contents";
+            containedItemsKey = "Contents";
             canRemoveThings = true;
         }
     }

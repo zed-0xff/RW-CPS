@@ -22,7 +22,7 @@ namespace zed_0xff.CPS {
             selectedPawns.Add(pawn);
             if (!pawn.IsPrisonerOfColony && !pawn.Downed)
             {
-                pawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VThingDefOf.EnterMultiBuilding, this), JobTag.Misc);
+                pawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VDefOf.EnterMultiBuilding, this), JobTag.Misc);
             }
         }
 

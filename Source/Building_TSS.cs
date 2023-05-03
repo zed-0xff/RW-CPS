@@ -13,7 +13,7 @@ namespace zed_0xff.CPS
 {
     // fixes 'Tried to get a resource "UI/Commands/ForPrisoners" from a different thread. All resources must be loaded in the main thread.'
     [StaticConstructorOnStartup]
-    public class Building_TSS : Building_MultiEnterable, IStoreSettingsParent, IThingHolderWithDrawnPawn {
+    public class Building_TSS : Building_MultiEnterable, IStoreSettingsParent, IThingHolderWithDrawnPawn, IBillTab, IBillGiver {
         public /*override*/ int MaxSlots => 16;
 
         private int ticksWithoutPower = 0;
@@ -211,7 +211,7 @@ namespace zed_0xff.CPS
 
         public override bool IsContentsSuspended => false;
 
-        public override Vector3 PawnDrawOffset => Vector3.zero; //IntVec3.West.RotatedBy(base.Rotation).ToVector3() / def.size.x;
+        public override Vector3 PawnDrawOffset => Vector3.zero;
 
         public override AcceptanceReport CanAcceptPawn(Pawn pawn)
         {
@@ -260,6 +260,12 @@ namespace zed_0xff.CPS
         ///////////////////////////////////////////////////////////////////////////////////////////
         // <UI>
 
+        [Unsaved]
+        private Effecter recipeEffecter = null;
+
+        [Unsaved]
+        private Sustainer recipeSound = null;
+
         static readonly Color TopColorNormal = new Color(0.6313726f, 71f / 85f, 0.7058824f);
         static readonly Color TopColorPrisoner = new Color(1f, 61f / 85f, 11f / 85f);
 
@@ -289,6 +295,10 @@ namespace zed_0xff.CPS
             new Vector3( 1.5f, 0, 0),
         };
 
+        private static readonly Vector2 BarSize = new Vector2(0.72f, 0.13f);
+        private static readonly Material UnfilledMat = SolidColorMaterials.NewSolidColorMaterial(new Color(0.3f, 0.3f, 0.3f, 0.65f), ShaderDatabase.MetaOverlay);
+        private static readonly Material FilledMat = SolidColorMaterials.NewSolidColorMaterial(new ColorInt(88, 16, 0).ToColor, ShaderDatabase.MetaOverlay);
+
         public override void Draw()
         {
             base.Draw();
@@ -307,6 +317,19 @@ namespace zed_0xff.CPS
 
             for( int i=0; i<4; i++ ){
                 TopGraphic.Draw(DrawPos + PawnDrawOffsets[i] + Altitudes.AltIncVect * 2f, base.Rotation, this);
+            }
+
+            // draw red recipe progressbar
+            if( currentBillReport != null && (int)Find.CameraDriver.CurrentZoom == 0){
+                GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
+                r.center = DrawPos;
+                r.center.z += 0.25f;
+                r.size = BarSize;
+                r.fillPercent = 1f - Mathf.Clamp01(currentBillReport.workLeft / currentBillReport.workTotal);
+                r.filledMat = FilledMat;
+                r.unfilledMat = UnfilledMat;
+                r.margin = 0.08f;
+                GenDraw.DrawFillableBar(r);
             }
         }
 
@@ -391,9 +414,9 @@ namespace zed_0xff.CPS
                     List<Pawn> pawns = new List<Pawn>();
                     pawns.AddRange(selectedPawns);
                     foreach( Pawn p in pawns ){
-                        if( p.CurJobDef == VThingDefOf.EnterMultiBuilding ){
+                        if( p.CurJobDef == VDefOf.EnterMultiBuilding ){
                             p.jobs.EndCurrentJob(JobCondition.InterruptForced);
-                        } else if ( p.CarriedBy != null && p.CarriedBy.CurJobDef == VThingDefOf.CarryToMultiBuilding ) {
+                        } else if ( p.CarriedBy != null && p.CarriedBy.CurJobDef == VDefOf.CarryToMultiBuilding ) {
                             p.CarriedBy.jobs.EndCurrentJob(JobCondition.InterruptForced);
                         }
                     }
@@ -423,7 +446,7 @@ namespace zed_0xff.CPS
             else if (SelectedPawns.Contains(selPawn) && !selPawn.IsPrisonerOfColony)
             {
                 yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate {
-                        selPawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VThingDefOf.EnterMultiBuilding, this), JobTag.Misc);
+                        selPawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VDefOf.EnterMultiBuilding, this), JobTag.Misc);
                         });
             }
             else if (!acceptanceReport.Reason.NullOrEmpty())
@@ -460,7 +483,7 @@ namespace zed_0xff.CPS
             yield return new FloatMenuOption("EnterBuilding".Translate(this), delegate {
                     // selPawns list is empty here
                     foreach( Pawn p in tmpQueuedPawns ){
-                        p.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VThingDefOf.EnterMultiBuilding, this), JobTag.Misc);
+                        p.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VDefOf.EnterMultiBuilding, this), JobTag.Misc);
                     }
                     tmpQueuedPawns.Clear();
                     });
@@ -514,6 +537,9 @@ namespace zed_0xff.CPS
             } else {
                 stringBuilder.AppendLineIfNotEmpty().Append("Nutrition".Translate()).Append(": ")
                     .Append(NutritionStored.ToStringByStyle(ToStringStyle.FloatMaxOne));
+            }
+            if( PowerOn && currentBillReport != null ){
+                stringBuilder.AppendLineIfNotEmpty().Append("TSS_BillReport".Translate(currentBillReport.bill.Label.ToString(), currentBillReport.workLeft.ToStringWorkAmount()));
             }
             if( Prefs.DevMode ){
                 stringBuilder.AppendLineIfNotEmpty().Append("Ticks without power: " + ticksWithoutPower);
@@ -635,11 +661,127 @@ namespace zed_0xff.CPS
 
         // </feeding>
         ///////////////////////////////////////////////////////////////////////////////////////////
+        // <IBillTab+IBillGiver+production>
 
-        // 1. play sound (does not play if called in rare tick)
+        // from Project RimFactory
+        protected class BillReport : IExposable
+        {
+            public BillReport()
+            {
+            }
+            public BillReport(Bill b, Bill_Medical bm)
+            {
+                bill = b;
+                medBill = bm;
+                workTotal = b.recipe.WorkAmountTotal(null);
+                workLeft = workTotal;
+            }
+            public Bill bill;
+            public Bill_Medical medBill;
+            public float workLeft;
+            public float workTotal;
+          
+            public void ExposeData()
+            {
+                Scribe_References.Look(ref bill, "bill");
+                Scribe_References.Look(ref medBill, "medBill");
+                Scribe_Values.Look(ref workLeft, "workLeft");
+            }
+        }
+
+        protected BillReport currentBillReport;
+
+        private BillStack billStack = null;
+        public BillStack BillStack {
+            get {
+                if( billStack == null )
+                    billStack = new BillStack(this);
+                return billStack;
+            }
+        }
+
+        public IEnumerable<RecipeDef> AllRecipes => this.def.AllRecipes;
+        public IEnumerable<RecipeDef> GetAllRecipes() {
+            return this.AllRecipes;
+        }
+
+        public bool CurrentlyUsableForBills() {
+            return false;
+        }
+
+        public bool UsableForBillsAfterFueling() {
+            return false;
+        }
+
+        public void Notify_BillDeleted(Bill bill) {
+        }
+
+        public IEnumerable<IntVec3> IngredientStackCells => Enumerable.Empty<IntVec3>();
+
+        protected virtual void ProduceItems() {
+            if( currentBillReport?.medBill?.GiverPawn == null || !innerContainer.Contains(currentBillReport.medBill.GiverPawn) ) return;
+        }
+
+        protected IEnumerable<Bill> AllBillsShouldDoNow => from b in BillStack.Bills
+                                                           where b.ShouldDoNow()
+                                                           select b;
+
+        public static readonly MethodInfo _TryFindBestBillIngredientsInSet =
+            typeof(WorkGiver_DoBill).GetMethod("TryFindBestBillIngredientsInSet", BindingFlags.NonPublic | BindingFlags.Static);
+
+        bool TryFindBestBillIngredientsInSet(List<Thing> accessibleThings, Bill b, List<ThingCount> chosen)
+        {
+            //TryFindBestBillIngredientsInSet Expects a List of Both Avilibale & Allowed Things as "accessibleThings"
+            List<IngredientCount> missing = new List<IngredientCount>(); // Needed for 1.4
+            return (bool)_TryFindBestBillIngredientsInSet.Invoke(null, new object[] { accessibleThings, b, chosen, new IntVec3(), false, missing });
+        }
+
+        // TODO: cache
+        Pawn findPawnForBloodDraw( RecipeDef rdef ){
+            var r = new Recipe_ExtractHemogen_TSS();
+            r.recipe = rdef;
+
+            foreach( Thing t in innerContainer ){
+                if( !(t is Pawn pawn) ) continue;
+
+                var bloodLossHediff = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
+                if( bloodLossHediff != null) continue;
+
+                if( r.AvailableReport(pawn).Accepted ){
+                    return pawn;
+                }
+            }
+            return null;
+        }
+
+        // TryGetNextBill returns a new BillReport to start if one is available
+        protected BillReport TryGetNextBill()
+        {
+            var allThings = from t in innerContainer where !(t is Pawn) select t;
+            IEnumerable<Bill> allBills = AllBillsShouldDoNow;
+
+            foreach (Bill b in allBills)
+            {
+                if( b.recipe == VDefOf.CPS_DrawBlood_All ){
+                    Pawn pawn = findPawnForBloodDraw(b.recipe);
+                    if( pawn == null ) continue;
+
+                    Bill_Medical bm = HealthCardUtility.CreateSurgeryBill(pawn, b.recipe, null, null, false);
+                    return new BillReport(b, bm);
+                }
+            }
+            return null;
+        }
+
+        // </IBillTab+IBillGiver+production>
+        ///////////////////////////////////////////////////////////////////////////////////////////
+
+        // 1. play recipeSound (does not play if called in rare tick)
         // 2. tick contained pawns
         // 3. make them rest
-        // 4. call TickRare()
+        // 4. do bills
+        // 5. tick effects
+        // 6. call TickRare()
         public override void Tick()
         {
             if( PowerOn ){
@@ -649,21 +791,75 @@ namespace zed_0xff.CPS
                     } else {
                         sustainerWorking.Maintain();
                     }
-                    int np = 0;
-                    foreach( Thing t in innerContainer ) {
-                        if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
-                            np++;
-                            pawn.needs.rest.TickResting(restEffectiveness);
+                    if (this.IsHashIntervalTick(10)){
+                        if (currentBillReport != null) {
+
+                            currentBillReport.workLeft -= 10f*0.5f; /* ProductionSpeedFactor */
+                            if (currentBillReport.workLeft <= 0) {
+                                ProduceItems();
+                                try {
+                                    // HACK bc we don't create a virtual pawn as RimFactory does, the record will be as if pawn operated on themselves %)
+                                    Pawn billDoer = currentBillReport.medBill.GiverPawn;
+                                    int op0 = billDoer.records.GetAsInt(RecordDefOf.OperationsPerformed);
+                                    var l = new List<Thing>();
+                                    // tick workbench bill counters, like 'make 10 things'
+                                    currentBillReport.bill.Notify_IterationCompleted(billDoer, l);
+                                    // apply medical bill effects and results
+                                    currentBillReport.medBill.Notify_IterationCompleted(billDoer, l);
+                                    if( billDoer.records.GetAsInt(RecordDefOf.OperationsPerformed) != op0 ){
+                                        // fix them back
+                                        billDoer.records.AddTo(RecordDefOf.OperationsPerformed, -1);
+                                    }
+                                } catch (Exception ex) {
+                                    Log.Error("[!] TSS: error finishing " + currentBillReport.bill + ": " + ex);
+                                }
+                                currentBillReport = null;
+                            }
+                        } else if ( this.IsHashIntervalTick(60) ) {
+                            //Start Bill if Possible
+                            currentBillReport = TryGetNextBill();
                         }
                     }
-                    if( np != nPawns ){
-                        // someone was ejected
-                        topPawns = null;
-                        nPawns = np;
+                }
+
+                // check for ejected pawns, tick resting
+                int np = 0;
+                foreach( Thing t in innerContainer ) {
+                    if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
+                        np++;
+                        pawn.needs.rest.TickResting(restEffectiveness);
                     }
+                }
+                if( np != nPawns ){
+                    // someone was ejected
+                    topPawns = null;
+                    nPawns = np;
                 }
             }
             base.Tick();
+
+            // effects
+            if (currentBillReport != null && PowerOn){
+                if (recipeEffecter == null) {
+                    recipeEffecter = currentBillReport.bill.recipe?.effectWorking?.Spawn();
+                }
+                if (recipeSound == null) {
+                    recipeSound = currentBillReport.bill.recipe?.soundWorking?.TrySpawnSustainer(this);
+                }
+                if( (int)Find.CameraDriver.CurrentZoom == 0 ){
+                    recipeEffecter?.EffectTick(this, this);
+                }
+                recipeSound?.SustainerUpdate();
+            } else {
+                if (recipeEffecter != null) {
+                    recipeEffecter.Cleanup();
+                    recipeEffecter = null;
+                }
+                if (recipeSound != null) {
+                    recipeSound.End();
+                    recipeSound = null;
+                }
+            }
 
             innerContainer.ThingOwnerTick();
 
@@ -676,6 +872,7 @@ namespace zed_0xff.CPS
         // 2. eject all on power failure check
         // 3. rotate pawns
         // 4. feed pawns
+        // 5. draw blood from pawns
         public override void TickRare()
         {
             nPawns = 0;
@@ -730,6 +927,10 @@ namespace zed_0xff.CPS
             Scribe_Deep.Look(ref allowedNutritionSettings, "allowedNutritionSettings");
             Scribe_Values.Look(ref forOwnerType, "forOwnerType", BedOwnerType.Colonist);
             Scribe_Values.Look(ref ticksWithoutPower, "ticksWithoutPower", 0);
+
+            Scribe_Deep.Look(ref billStack, "bills", this);
+            Scribe_Deep.Look(ref currentBillReport, "currentBillReport");
+
             if (allowedNutritionSettings == null)
             {
                 allowedNutritionSettings = new StorageSettings(this);

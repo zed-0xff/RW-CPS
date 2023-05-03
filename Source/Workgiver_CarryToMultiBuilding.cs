@@ -42,7 +42,7 @@ namespace zed_0xff.CPS {
             {
                 return null;
             }
-            Job job = JobMaker.MakeJob(VThingDefOf.CarryToMultiBuilding, building, pawn2);
+            Job job = JobMaker.MakeJob(VDefOf.CarryToMultiBuilding, building, pawn2);
             job.count = 1;
             return job;
         }

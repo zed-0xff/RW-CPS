@@ -1,0 +1,7 @@
+<Patch>
+  <Operation Class="PatchOperationAttributeAdd">
+    <xpath>Defs/RecipeDef[defName="BloodTransfusion"]</xpath>
+    <value>BloodTransfusion</value>
+    <attribute>Name</attribute>
+  </Operation>
+</Patch>

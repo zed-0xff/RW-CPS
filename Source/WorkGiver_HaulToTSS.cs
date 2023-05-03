@@ -8,7 +8,7 @@ namespace zed_0xff.CPS {
     {
         private const float NutritionBuffer = 2.5f;
 
-        public override ThingRequest PotentialWorkThingRequest => ThingRequest.ForDef(VThingDefOf.CPS_TSS);
+        public override ThingRequest PotentialWorkThingRequest => ThingRequest.ForDef(VDefOf.CPS_TSS);
 
         public override PathEndMode PathEndMode => PathEndMode.Touch;
 
