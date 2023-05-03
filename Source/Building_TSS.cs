@@ -11,6 +11,8 @@ using Verse.Sound;
 
 namespace zed_0xff.CPS
 {
+    // fixes 'Tried to get a resource "UI/Commands/ForPrisoners" from a different thread. All resources must be loaded in the main thread.'
+    [StaticConstructorOnStartup]
     public class Building_TSS : Building_MultiEnterable, IStoreSettingsParent, IThingHolderWithDrawnPawn {
         public /*override*/ int MaxSlots => 16;
 
@@ -317,17 +319,8 @@ namespace zed_0xff.CPS
             }
         }
 
-        [Unsaved(false)]
-        private Texture2D cachedInsertPawnTex;
-
-        public Texture2D InsertPawnTex {
-            get {
-                if (cachedInsertPawnTex == null) {
-                    cachedInsertPawnTex = ContentFinder<Texture2D>.Get("UI/Gizmos/InsertPawn");
-                }
-                return cachedInsertPawnTex;
-            }
-        }
+        private static readonly Texture2D InsertIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/InsertPawn");
+        private static readonly Texture2D CancelIcon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel");
 
         public override IEnumerable<Gizmo> GetGizmos()
         {
@@ -361,7 +354,7 @@ namespace zed_0xff.CPS
             {
                 Command_Action ca = new Command_Action();
                 ca.defaultLabel = "InsertPerson".Translate() + "...";
-                ca.icon = InsertPawnTex;
+                ca.icon = InsertIcon;
                 ca.action = delegate
                 {
                     List<FloatMenuOption> list = new List<FloatMenuOption>();
@@ -384,6 +377,24 @@ namespace zed_0xff.CPS
                     ca.Disable("NoPower".Translate().CapitalizeFirst());
                 }
                 yield return ca;
+            }
+
+            if( SelectedPawns.Any() ) {
+                Command_Action c = new Command_Action();
+                c.defaultLabel = "CommandCancelLoad".Translate();
+                c.defaultDesc = "CommandCancelLoadDesc".Translate();
+                c.icon = CancelIcon;
+                c.activateSound = SoundDefOf.Designate_Cancel;
+                c.action = delegate
+                {
+                    foreach( Pawn p in selectedPawns ){
+                        if( p.CurJobDef == VThingDefOf.EnterMultiBuilding ){
+                            p.jobs.EndCurrentJob(JobCondition.InterruptForced);
+                        }
+                    }
+                    SelectedPawns.Clear();
+                };
+                yield return c;
             }
         }
 

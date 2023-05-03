@@ -29,6 +29,10 @@ namespace zed_0xff.CPS
                     {
                     Building.SelectedPawns.Add(Takee);
                     });
+            AddFinishAction(delegate
+                    {
+                    Building.SelectedPawns.Remove(Takee); // will be called on job cancel too
+                    });
             yield return Toils_Goto.GotoThing(TargetIndex.B, PathEndMode.OnCell);
             yield return Toils_Haul.StartCarryThing(TargetIndex.B);
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);

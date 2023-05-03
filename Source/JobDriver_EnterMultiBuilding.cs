@@ -23,6 +23,10 @@ namespace zed_0xff.CPS
                     {
                     Building.SelectedPawns.Add(pawn);
                     });
+            AddFinishAction(delegate
+                    {
+                    Building.SelectedPawns.Remove(pawn); // will be called on job cancel too
+                    });
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);
             yield return Toils_General.WaitWith(TargetIndex.A, 60, useProgressBar: true);
             yield return Toils_General.Do(delegate
