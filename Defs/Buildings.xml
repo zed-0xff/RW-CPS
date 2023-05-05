@@ -247,7 +247,7 @@
         <initialAllowAutoRefuel>false</initialAllowAutoRefuel>
         <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
         <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
-        <fuelLabel>Hemogen</fuelLabel>
+        <fuelLabel>Hemogen reserve</fuelLabel>
         <externalTicking>true</externalTicking>
       </li>
     </comps>
