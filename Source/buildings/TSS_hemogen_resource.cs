@@ -16,7 +16,7 @@ public partial class Building_TSS : IResourceStore {
 
     [Unsaved(false)]
     private CompRefuelable cachedRefuelableComp;
-    private CompRefuelable RefuelableComp
+    public CompRefuelable RefuelableComp
     {
         get
         {
