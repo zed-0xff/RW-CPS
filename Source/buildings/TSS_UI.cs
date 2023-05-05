@@ -177,6 +177,10 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             };
             yield return c;
         }
+
+        if (ModsConfig.BiotechActive) {
+            yield return new Gizmo_ResourceHemogen(this);
+        }
     }
 
     public override IEnumerable<FloatMenuOption> GetFloatMenuOptions(Pawn selPawn)

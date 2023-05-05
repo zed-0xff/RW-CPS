@@ -235,6 +235,21 @@
         <explosiveRadius>8</explosiveRadius>
         <explosiveDamageType>Flame</explosiveDamageType>
       </li>
+      <li Class="CompProperties_Refuelable" MayRequire="Ludeon.RimWorld.Biotech">
+        <fuelConsumptionRate>0</fuelConsumptionRate>
+        <fuelCapacity>10</fuelCapacity>
+        <fuelFilter>
+          <thingDefs>
+            <li>HemogenPack</li>
+          </thingDefs>
+        </fuelFilter>
+        <showAllowAutoRefuelToggle>false</showAllowAutoRefuelToggle>
+        <initialAllowAutoRefuel>false</initialAllowAutoRefuel>
+        <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
+        <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
+        <fuelLabel>Hemogen</fuelLabel>
+        <externalTicking>true</externalTicking>
+      </li>
     </comps>
     <uiOrder>2010</uiOrder>
     <tickerType>Normal</tickerType>
