@@ -20,9 +20,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     private int curOffset = 0;
     private int nPawns = 0;
 
-//        public CompResource pasteComp = null;
-//        public CompResource hemogenComp = null;
-
     private const float BasePawnConsumedNutritionPerDay = 1.6f;
     public const float NutritionBuffer = BasePawnConsumedNutritionPerDay * 10; // should be MaxSlots here?
     public float restEffectiveness = StatDefOf.BedRestEffectiveness.valueIfMissing;
@@ -171,7 +168,16 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 hemogenNetAdapter = (IPipeNetAdapter)Activator.CreateInstance(t, new object[] { this });
             }
         }
+
+        if (ModLister.HasActiveModWithName("Dubs Bad Hygiene") || ModLister.HasActiveModWithName("Dubs Bad Hygiene Lite")) {
+            Type t = GenTypes.GetTypeInAnyAssembly("zed_0xff.CPS.Plugin_DBH");
+            if( t != null ){
+                dbh = (IPlugin)Activator.CreateInstance(t, new object[] { this });
+            }
+        }
     }
+
+    private IPlugin dbh = null;
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
     {
@@ -355,7 +361,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     // 2. eject all on power failure check
     // 3. rotate pawns
     // 4. feed pawns
-    // 5. draw blood from pawns
+    // 5. check DBH needs
     public override void TickRare()
     {
         nPawns = 0;
@@ -379,6 +385,13 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 if( t is Pawn pawn && !pawn.Dead ){
                     pawn.health.AddHediff(HediffDefOf.CryptosleepSickness);
                     pawn.needs?.mood?.thoughts?.memories?.RemoveMemoriesOfDef(ThoughtDefOf.SleptOutside);
+                }
+            }
+            if( dbh != null ){
+                foreach( Thing t in innerContainer ){
+                    if( t is Pawn pawn ){
+                        dbh.ProcessPawn(pawn);
+                    }
                 }
             }
         } else {
