@@ -7,21 +7,16 @@ namespace zed_0xff.CPS;
 
 // count hemogen packs inside the TSS, not on map
 public class Recipe_BloodTransfusion_TSS : Recipe_Surgery {
-	public const float BloodlossHealedPerPack = 0.35f;
 
-	public override bool CompletableEver(Pawn surgeryTarget)
-	{
-		if (!surgeryTarget.health.hediffSet.HasHediff(HediffDefOf.BloodLoss))
-		{
+	public override bool CompletableEver(Pawn surgeryTarget) {
+		if (!surgeryTarget.health.hediffSet.HasHediff(HediffDefOf.BloodLoss)) {
 			return false;
 		}
 		return base.CompletableEver(surgeryTarget);
 	}
 
-	public override bool AvailableOnNow(Thing thing, BodyPartRecord part = null)
-	{
-		if (thing.MapHeld == null)
-		{
+	public override bool AvailableOnNow(Thing thing, BodyPartRecord part = null) {
+		if (thing.MapHeld == null) {
 			return false;
 		}
 		if (thing is Pawn pawn) {
@@ -29,48 +24,38 @@ public class Recipe_BloodTransfusion_TSS : Recipe_Surgery {
                 return false;
             if( !(pawn.ParentHolder is Building_TSS tss) )
                 return false;
-            if( tss.Value < 1 ) // TODO: hemogen net
+            if( !tss.HasAnyHemogen() )
                 return false;
 		}
 		return base.AvailableOnNow(thing, part);
 	}
 
-	public override void ConsumeIngredient(Thing ingredient, RecipeDef recipe, Map map)
-	{
+	public override void ConsumeIngredient(Thing ingredient, RecipeDef recipe, Map map) {
 	}
 
 	public override void ApplyOnPawn(Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill)
 	{
-		if (!ModsConfig.BiotechActive)
-		{
+		if (!ModsConfig.BiotechActive) {
 			return;
 		}
 		float num = 0f;
 		float num2 = 0f;
-        Log.Warning("[d] ingrs=" + ingredients?.Count);
-		for (int i = 0; i < ingredients.Count; i++)
-		{
-			if (!ingredients[i].def.IsMedicine)
-			{
-				num += 0.35f * (float)ingredients[i].stackCount;
+		for (int i = 0; i < ingredients.Count; i++) {
+			if (!ingredients[i].def.IsMedicine) {
+				num += Recipe_BloodTransfusion.BloodlossHealedPerPack * (float)ingredients[i].stackCount;
 				num2 += JobGiver_GetHemogen.HemogenPackHemogenGain * (float)ingredients[i].stackCount;
 			}
 		}
-        Log.Warning("[d] ingrs=" + ingredients?.Count + " num=" + num + " num2=" + num2);
-		if (num > 0f)
-		{
+		if (num > 0f) {
 			Hediff firstHediffOfDef = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
-			if (firstHediffOfDef != null)
-			{
+			if (firstHediffOfDef != null) {
 				firstHediffOfDef.Severity -= num;
 			}
 		}
-		if (num2 > 0f && pawn.genes?.GetFirstGeneOfType<Gene_Hemogen>() != null)
-		{
+		if (num2 > 0f && pawn.genes?.GetFirstGeneOfType<Gene_Hemogen>() != null) {
 			GeneUtility.OffsetHemogen(pawn, num2);
 		}
-		for (int j = 0; j < ingredients.Count; j++)
-		{
+		for (int j = 0; j < ingredients.Count; j++) {
 			ingredients[j].Destroy();
 		}
 	}

@@ -164,6 +164,13 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             }
         }
         dispensers.Add(new Dispenser_Internal(this));
+
+        if (ModLister.HasActiveModWithName("Vanilla Races Expanded - Sanguophage")){
+            Type t = GenTypes.GetTypeInAnyAssembly("zed_0xff.CPS.HemogenNetAdapter");
+            if( t != null ){
+                hemogenNetAdapter = (IPipeNetAdapter)Activator.CreateInstance(t, new object[] { this });
+            }
+        }
     }
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)

@@ -51,6 +51,9 @@ public class CPSMod : Mod
         if (ModLister.HasActiveModWithName("Vanilla Nutrient Paste Expanded")) {
             LoadPlugin(content, "VNPE");
         }
+        if (ModLister.HasActiveModWithName("Vanilla Races Expanded - Sanguophage")) {
+            LoadPlugin(content, "VRES");
+        }
 //        if( plugins.Any() ){
 //            GenTypes.ClearCache();
 //        }

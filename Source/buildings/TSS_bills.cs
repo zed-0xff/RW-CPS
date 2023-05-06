@@ -162,7 +162,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                         foreach( var ingr in b.recipe.ingredients ){
                             if( ingr.FixedIngredient == ThingDefOf.HemogenPack ){
                                 ingredients.Add(ThingMaker.MakeThing(ThingDefOf.HemogenPack));
-                                RefuelableComp.ConsumeFuel(1); // Recipe_BloodTransfusion_TSS checks that TSS has enough
+                                ConsumeAnyHemogen(); // Recipe_BloodTransfusion_TSS checks that TSS has enough
                             }
                         }
                         Bill_Medical bm = HealthCardUtility.CreateSurgeryBill(

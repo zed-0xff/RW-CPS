@@ -29,11 +29,8 @@ public class Recipe_ExtractHemogen_TSS : Recipe_ExtractHemogen {
     }
 
     protected override void OnSurgerySuccess(Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill) {
-        if( pawn.ParentHolder is Building_TSS tss && tss.Value < tss.TargetValue ){
-            tss.RefuelableComp.Refuel(1);
-        } else {
-            // TODO: hemogen network
-            GenPlace.TryPlaceThing(ThingMaker.MakeThing(ThingDefOf.HemogenPack), pawn.PositionHeld, pawn.MapHeld, ThingPlaceMode.Near);
+        if( pawn.ParentHolder is Building_TSS tss ){
+            tss.AddHemogenPack();
         }
     }
 

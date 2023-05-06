@@ -18,7 +18,7 @@
 
     <ItemGroup>
         <Compile Remove="*" />
-        <Compile Include="CPS_VNPE.cs" />
+        <Compile Include="CPS_VRES.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -32,10 +32,6 @@
         </Reference>
         <Reference Include="PipeSystem">
             <HintPath>../../../../workshop/2023507013/1.4/Assemblies/PipeSystem.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="VNPE">
-            <HintPath>../../../../workshop/2920385763/1.4/Assemblies/VNPE.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
