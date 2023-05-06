@@ -27,4 +27,11 @@ TSS:
           <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
       </li>
   </modDependencies>
+  <loadAfter>
+    <li>Ludeon.RimWorld</li>
+    <li>brrainz.harmony</li>
+    <li>OskarPotocki.VanillaFactionsExpanded.Core</li>
+    <li>VanillaExpanded.VNutrientE</li>
+    <li>vanillaracesexpanded.sanguophage</li>
+  </loadAfter>
 </ModMetaData>

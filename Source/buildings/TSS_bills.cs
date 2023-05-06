@@ -211,10 +211,10 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
         // effects
         if (currentBillReport != null && PowerOn){
-            if ( recipeEffecter == null && ModConfig.Settings.tss.effects ) {
+            if ( recipeEffecter == null && CPSMod.Settings.tss.effects ) {
                 recipeEffecter = currentBillReport.bill.recipe?.effectWorking?.Spawn();
             }
-            if ( recipeSound == null && ModConfig.Settings.tss.sounds ) {
+            if ( recipeSound == null && CPSMod.Settings.tss.sounds ) {
                 recipeSound = currentBillReport.bill.recipe?.soundWorking?.TrySpawnSustainer(this);
             }
             if( (int)Find.CameraDriver.CurrentZoom == 0 ){

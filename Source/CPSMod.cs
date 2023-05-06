@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using Verse;
 using UnityEngine;
 
@@ -34,15 +36,37 @@ public class CPSSettings : ModSettings
     }
 }
 
-public class ModConfig : Mod
+public class CPSMod : Mod
 {
     public override string SettingsCategory() => "CPS";
 
     public static CPSSettings Settings { get; private set; }
 
-    public ModConfig(ModContentPack content) : base(content)
-    {
+    public static List<Assembly> plugins = new List<Assembly>();
+
+    public CPSMod(ModContentPack content) : base(content) {
         Settings = GetSettings<CPSSettings>();
+
+        plugins.Clear();
+        if (ModLister.HasActiveModWithName("Vanilla Nutrient Paste Expanded")) {
+            LoadPlugin(content, "VNPE");
+        }
+//        if( plugins.Any() ){
+//            GenTypes.ClearCache();
+//        }
+    }
+
+    private void LoadPlugin(ModContentPack content, string name){
+        try {
+            string fname = Path.Combine(content.RootDir, "Plugins", "CPS_" + name + ".dll");
+            byte[] rawAssembly = File.ReadAllBytes(fname);
+            Assembly assembly = AppDomain.CurrentDomain.Load(rawAssembly);
+            Log.Message("[d] CPS loaded plugin " + assembly);
+            content.assemblies.loadedAssemblies.Add(assembly);
+            plugins.Add(assembly);
+        } catch(Exception ex) {
+            Log.Error("[!] CPS: plugin " + name + " failed to load: " + ex);
+        }
     }
 
     private static Vector2 scrollPosition = Vector2.zero;

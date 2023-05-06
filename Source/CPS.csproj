@@ -4,6 +4,7 @@
     <RootNamespace>zed.0xff.CPS</RootNamespace>
     <TargetFramework>net472</TargetFramework>
     <LangVersion>10</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -16,7 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+    <Compile Remove="Plugins\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>

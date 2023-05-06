@@ -156,6 +156,14 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             def.statBases.StatListContains(StatDefOf.Beauty)
             ? this.GetStatValue(StatDefOf.Beauty) 
             : StatDefOf.Beauty.valueIfMissing;
+
+        if (ModLister.HasActiveModWithName("Vanilla Nutrient Paste Expanded")) {
+            Type t = GenTypes.GetTypeInAnyAssembly("zed_0xff.CPS.Dispenser_VNPE");
+            if( t != null ){
+                dispensers.Add((IDispenser)Activator.CreateInstance(t, new object[] { this }));
+            }
+        }
+        dispensers.Add(new Dispenser_Internal(this));
     }
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
@@ -293,84 +301,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
        }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // <feeding>
-
-    public bool CanDispenseNow => PowerOn && HasEnoughFeedstockInHoppers();
-
-    public virtual bool CanMakePasteFrom(Thing t){
-        return t != null
-            && !(t is Pawn)
-            && !(t is Corpse)
-            && Building_NutrientPasteDispenser.IsAcceptableFeedstock(t.def);
-    }
-
-    // from Building_NutrientPasteDispenser
-    public virtual bool HasEnoughFeedstockInHoppers()
-    {
-        float num = 0f;
-        foreach( Thing feedStock in innerContainer ){
-            if( !CanMakePasteFrom(feedStock) ) continue;
-
-            num += (float)feedStock.stackCount * feedStock.GetStatValue(StatDefOf.Nutrition);
-            if (num >= def.building.nutritionCostPerDispense) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // from Building_NutrientPasteDispenser
-    public virtual Thing TryDispenseFood()
-    {
-        if (!CanDispenseNow) {
-            return null;
-        }
-        float num = def.building.nutritionCostPerDispense - 0.0001f;
-        List<ThingDef> list = new List<ThingDef>();
-
-        foreach( Thing thing in innerContainer ){
-            if( !CanMakePasteFrom(thing) ) continue;
-
-            int num2 = Mathf.Min(thing.stackCount, Mathf.CeilToInt(num / thing.GetStatValue(StatDefOf.Nutrition)));
-            num -= (float)num2 * thing.GetStatValue(StatDefOf.Nutrition);
-            list.Add(thing.def);
-            thing.SplitOff(num2);
-            if( num <= 0f )
-                break;
-        }
-
-        Thing meal = ThingMaker.MakeThing(ThingDefOf.MealNutrientPaste);
-        CompIngredients compIngredients = meal.TryGetComp<CompIngredients>();
-        for (int i = 0; i < list.Count; i++) {
-            compIngredients.RegisterIngredient(list[i]);
-        }
-        return meal;
-    }
-
-    void feedOccupants(){
-        if( nPawns == 0 ) return;
-
-        foreach( Thing t in innerContainer ){
-            Pawn pawn = t as Pawn;
-            if( pawn == null || pawn.Dead || pawn.needs?.food == null )
-                continue;
-            if (pawn.needs.food.CurLevelPercentage > 0.4)
-                continue;
-
-            Thing meal = TryDispenseFood();
-            if( meal == null )
-                break;
-
-            var ingestedNum = meal.Ingested(pawn, pawn.needs.food.NutritionWanted);
-            pawn.needs.food.CurLevel += ingestedNum;
-            pawn.records.AddTo(RecordDefOf.NutritionEaten, ingestedNum);
-        }
-    }
-
-    // </feeding>
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
     // 1. play recipeSound (does not play if called in rare tick)
     // 2. tick contained pawns
     // 3. make them rest
@@ -381,7 +311,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     {
         if( PowerOn ){
             if ( nPawns > 0 ){
-                if( ModConfig.Settings.tss.sounds ){
+                if( CPSMod.Settings.tss.sounds ){
                     if (sustainerWorking == null || sustainerWorking.Ended) {
                         sustainerWorking = SoundDefOf.GeneExtractor_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
                     } else {
