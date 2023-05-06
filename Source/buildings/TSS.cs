@@ -381,10 +381,12 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     {
         if( PowerOn ){
             if ( nPawns > 0 ){
-                if (sustainerWorking == null || sustainerWorking.Ended) {
-                    sustainerWorking = SoundDefOf.GeneExtractor_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
-                } else {
-                    sustainerWorking.Maintain();
+                if( ModConfig.Settings.tss.sounds ){
+                    if (sustainerWorking == null || sustainerWorking.Ended) {
+                        sustainerWorking = SoundDefOf.GeneExtractor_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
+                    } else {
+                        sustainerWorking.Maintain();
+                    }
                 }
             }
 
