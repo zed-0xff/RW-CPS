@@ -216,6 +216,12 @@
     <fillPercent>0.8</fillPercent>
     <drawGUIOverlay>true</drawGUIOverlay>
     <comps>
+      <li MayRequire="VanillaExpanded.VNutrientE" Class="PipeSystem.CompProperties_Resource">
+        <pipeNet>VNPE_NutrientPasteNet</pipeNet>
+      </li>
+      <li MayRequire="vanillaracesexpanded.sanguophage" Class="PipeSystem.CompProperties_Resource">
+        <pipeNet>VRE_HemogenNet</pipeNet>
+      </li>
       <!--li Class="CompProperties_AssignableToPawn">
         <drawAssignmentOverlay>false</drawAssignmentOverlay>
         <compClass>CompAssignableToPawn</compClass>
