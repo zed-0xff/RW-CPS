@@ -386,35 +386,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 } else {
                     sustainerWorking.Maintain();
                 }
-                if (this.IsHashIntervalTick(10)){
-                    if (currentBillReport != null) {
-
-                        currentBillReport.workLeft -= 10f*0.5f; /* ProductionSpeedFactor */
-                        if (currentBillReport.workLeft <= 0) {
-                            ProduceItems();
-                            try {
-                                // HACK bc we don't create a virtual pawn as RimFactory does, the record will be as if pawn operated on themselves %)
-                                Pawn billDoer = currentBillReport.medBill.GiverPawn;
-                                int op0 = billDoer.records.GetAsInt(RecordDefOf.OperationsPerformed);
-                                var l = new List<Thing>();
-                                // tick workbench bill counters, like 'make 10 things'
-                                currentBillReport.bill.Notify_IterationCompleted(billDoer, l);
-                                // apply medical bill effects and results
-                                currentBillReport.medBill.Notify_IterationCompleted(billDoer, l);
-                                if( billDoer.records.GetAsInt(RecordDefOf.OperationsPerformed) != op0 ){
-                                    // fix them back
-                                    billDoer.records.AddTo(RecordDefOf.OperationsPerformed, -1);
-                                }
-                            } catch (Exception ex) {
-                                Log.Error("[!] TSS: error finishing " + currentBillReport.bill + ": " + ex);
-                            }
-                            currentBillReport = null;
-                        }
-                    } else if ( this.IsHashIntervalTick(60) ) {
-                        //Start Bill if Possible
-                        currentBillReport = TryGetNextBill();
-                    }
-                }
             }
 
             // check for ejected pawns, tick resting
@@ -432,31 +403,9 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             }
         }
         base.Tick();
-
-        // effects
-        if (currentBillReport != null && PowerOn){
-            if (recipeEffecter == null) {
-                recipeEffecter = currentBillReport.bill.recipe?.effectWorking?.Spawn();
-            }
-            if (recipeSound == null) {
-                recipeSound = currentBillReport.bill.recipe?.soundWorking?.TrySpawnSustainer(this);
-            }
-            if( (int)Find.CameraDriver.CurrentZoom == 0 ){
-                recipeEffecter?.EffectTick(this, this);
-            }
-            recipeSound?.SustainerUpdate();
-        } else {
-            if (recipeEffecter != null) {
-                recipeEffecter.Cleanup();
-                recipeEffecter = null;
-            }
-            if (recipeSound != null) {
-                recipeSound.End();
-                recipeSound = null;
-            }
-        }
-
         innerContainer.ThingOwnerTick();
+
+        Tick_Bills();
 
         if (this.IsHashIntervalTick(250) || topPawns == null) {
             TickRare();

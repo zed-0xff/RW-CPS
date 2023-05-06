@@ -4,6 +4,7 @@ using Verse;
 
 namespace zed_0xff.CPS;
 
+// removing billDoer
 public class Recipe_ExtractHemogen_TSS : Recipe_ExtractHemogen {
 
     public override void ApplyOnPawn(Pawn pawn, BodyPartRecord part, Pawn billDoer, List<Thing> ingredients, Bill bill)
@@ -18,7 +19,7 @@ public class Recipe_ExtractHemogen_TSS : Recipe_ExtractHemogen {
             return;
         }
         Hediff hediff = HediffMaker.MakeHediff(HediffDefOf.BloodLoss, pawn);
-        hediff.Severity = 0.59f; // 0.6 pops up unwanted health alert
+        hediff.Severity = 0.49f; // less than 0.5 to not trigger CPS_BloodTransfusion_All_50
         pawn.health.AddHediff(hediff);
         OnSurgerySuccess(pawn, part, billDoer, ingredients, bill);
         if (IsViolationOnPawn(pawn, part, Faction.OfPlayer))

@@ -33,6 +33,7 @@
   <!-- transfuse -->
 
   <RecipeDef Name="CPS_BloodTransfusion" ParentName="BloodTransfusion" Abstract="True">
+    <workerClass>zed_0xff.CPS.Recipe_BloodTransfusion_TSS</workerClass>
   </RecipeDef>
 
   <RecipeDef ParentName="CPS_BloodTransfusion">

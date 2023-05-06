@@ -50,7 +50,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
     private static readonly Vector2 BarSize = new Vector2(0.72f, 0.13f);
     private static readonly Material UnfilledMat = SolidColorMaterials.NewSolidColorMaterial(new Color(0.3f, 0.3f, 0.3f, 0.65f), ShaderDatabase.MetaOverlay);
-    private static readonly Material FilledMat = SolidColorMaterials.NewSolidColorMaterial(new ColorInt(88, 16, 0).ToColor, ShaderDatabase.MetaOverlay);
+    private static readonly Material FilledMat = SolidColorMaterials.NewSolidColorMaterial(new ColorInt(138, 3, 3).ToColor, ShaderDatabase.MetaOverlay);
 
     public override void Draw()
     {

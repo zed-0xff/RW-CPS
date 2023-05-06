@@ -13,29 +13,32 @@ namespace zed_0xff.CPS;
 
 public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParent, IThingHolderWithDrawnPawn, IBillTab, IBillGiver {
 
-    // from Project RimFactory
-    protected class BillReport : IExposable
-    {
-        public BillReport()
-        {
-        }
-        public BillReport(Bill b, Bill_Medical bm)
-        {
-            bill = b;
-            medBill = bm;
-            workTotal = b.recipe.WorkAmountTotal(null);
-            workLeft = workTotal;
-        }
+    // thx to Project RimFactory
+    protected class BillReport : IExposable {
         public Bill bill;
         public Bill_Medical medBill;
         public float workLeft;
         public float workTotal;
+        public List<Thing> ingredients;
       
-        public void ExposeData()
-        {
+        // for Scribe
+        public BillReport() {}
+
+        public BillReport(Bill b, Bill_Medical bm, List<Thing> ingrs) {
+            bill = b;
+            medBill = bm;
+            workTotal = b.recipe.WorkAmountTotal(null);
+            workLeft = workTotal;
+            ingredients = ingrs;
+        }
+
+        public void ExposeData() {
             Scribe_References.Look(ref bill, "bill");
             Scribe_References.Look(ref medBill, "medBill");
             Scribe_Values.Look(ref workLeft, "workLeft");
+            Scribe_Values.Look(ref workTotal, "workTotal");
+            // deep because ingredients are not saved anywhere else (at least for hemogen transfusion)
+            Scribe_Collections.Look(ref ingredients, "ingredients", LookMode.Deep);
         }
     }
 
@@ -86,16 +89,27 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         return (bool)_TryFindBestBillIngredientsInSet.Invoke(null, new object[] { accessibleThings, b, chosen, new IntVec3(), false, missing });
     }
 
-    enum DonorType {
-        HemogenFarmPrisoner, Prisoner, Slave, Any
+    enum PatientType {
+        Donor_HemogenFarmPrisoner,
+        Donor_Prisoner,
+        Donor_Slave,
+        Donor_Any,
+
+        Recipient_Colonist_50,
+        Recipient_Colonist_100,
+        Recipient_All_50
     };
 
-    static readonly Dictionary<RecipeDef, DonorType> recipeMap  = new Dictionary<RecipeDef, DonorType>()
+    static readonly Dictionary<RecipeDef, PatientType> recipeMap  = new Dictionary<RecipeDef, PatientType>()
     {
-        { VDefOf.CPS_DrawBlood_HemogenFarmPrisoners, DonorType.HemogenFarmPrisoner },
-        { VDefOf.CPS_DrawBlood_AllPrisoners,         DonorType.Prisoner },
-        { VDefOf.CPS_DrawBlood_Slaves,               DonorType.Slave },
-        { VDefOf.CPS_DrawBlood_All,                  DonorType.Any },
+        { VDefOf.CPS_DrawBlood_HemogenFarmPrisoners, PatientType.Donor_HemogenFarmPrisoner },
+        { VDefOf.CPS_DrawBlood_AllPrisoners,         PatientType.Donor_Prisoner },
+        { VDefOf.CPS_DrawBlood_Slaves,               PatientType.Donor_Slave },
+        { VDefOf.CPS_DrawBlood_All,                  PatientType.Donor_Any },
+
+        { VDefOf.CPS_BloodTransfusion_Colonists_50,  PatientType.Recipient_Colonist_50 },
+        { VDefOf.CPS_BloodTransfusion_Colonists_100, PatientType.Recipient_Colonist_100 },
+        { VDefOf.CPS_BloodTransfusion_All_50,        PatientType.Recipient_All_50 },
     };
 
     // TryGetNextBill returns a new BillReport to start if one is available
@@ -104,38 +118,118 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         IEnumerable<Bill> allBills = AllBillsShouldDoNow;
         if( !allBills.Any() ) return null;
 
-        var dict = new Dictionary<DonorType, Pawn>();
+        var dict = new Dictionary<PatientType, Pawn>();
         foreach( Thing t in innerContainer ){
             if( t is Pawn pawn ){
-                if( pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss) != null) continue;
-                if( pawn.genes != null && pawn.genes.HasGene(GeneDefOf.Hemogenic)) continue;
+                var hediff = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
+                if( hediff == null ){
+                    // donor
+                    if( pawn.genes != null && pawn.genes.HasGene(GeneDefOf.Hemogenic)) continue;
 
-                if( pawn.IsPrisonerOfColony ){
-                    dict[DonorType.Prisoner] = pawn;
-                    if( pawn?.guest?.interactionMode == PrisonerInteractionModeDefOf.HemogenFarm ){
-                        dict[DonorType.HemogenFarmPrisoner] = pawn;
+                    if( pawn.IsPrisonerOfColony ){
+                        dict[PatientType.Donor_Prisoner] = pawn;
+                        if( pawn?.guest?.interactionMode == PrisonerInteractionModeDefOf.HemogenFarm ){
+                            dict[PatientType.Donor_HemogenFarmPrisoner] = pawn;
+                        }
+                    } else if( pawn.IsSlaveOfColony ){
+                        dict[PatientType.Donor_Slave] = pawn;
                     }
-                } else if( pawn.IsSlaveOfColony ){
-                    dict[DonorType.Slave] = pawn;
+                    dict[PatientType.Donor_Any] = pawn;
+                } else {
+                    // recipient
+                    if( hediff.Severity < 0.05f ) continue;
+
+                    if( hediff.Severity > 0.49f ){
+                        dict[PatientType.Recipient_All_50] = pawn;
+                    }
+                    if( !pawn.IsPrisonerOfColony && !pawn.IsSlaveOfColony ){
+                        if( hediff.Severity > 0.49f ){
+                            dict[PatientType.Recipient_Colonist_50] = pawn;
+                        }
+                        dict[PatientType.Recipient_Colonist_100] = pawn;
+                    }
                 }
-                dict[DonorType.Any] = pawn;
             }
         }
 
         foreach (Bill b in allBills) {
-            DonorType dtype;
+            PatientType dtype;
             if( recipeMap.TryGetValue(b.recipe, out dtype) ){
                 Pawn pawn;
                 if(dict.TryGetValue(dtype, out pawn)){
-                    var r = new Recipe_ExtractHemogen_TSS();
-                    r.recipe = b.recipe;
-                    if( r.AvailableReport(pawn).Accepted ){
-                        Bill_Medical bm = HealthCardUtility.CreateSurgeryBill(pawn, b.recipe, null, null, false);
-                        return new BillReport(b, bm);
+                    if( b.recipe.Worker.AvailableReport(pawn).Accepted ){
+                        List<Thing> ingredients = new List<Thing>();
+                        foreach( var ingr in b.recipe.ingredients ){
+                            if( ingr.FixedIngredient == ThingDefOf.HemogenPack ){
+                                ingredients.Add(ThingMaker.MakeThing(ThingDefOf.HemogenPack));
+                                RefuelableComp.ConsumeFuel(1); // Recipe_BloodTransfusion_TSS checks that TSS has enough
+                            }
+                        }
+                        Bill_Medical bm = HealthCardUtility.CreateSurgeryBill(
+                                pawn,
+                                b.recipe,
+                                null, // bodyPart
+                                null, // uniqueIngredients
+                                false // sendMessages
+                                );
+                        return new BillReport(b, bm, ingredients);
                     }
                 }
             }
         }
         return null;
+    }
+
+    private void Tick_Bills(){
+        if (PowerOn && this.IsHashIntervalTick(10)){
+            if (currentBillReport != null) {
+                currentBillReport.workLeft -= 10f*0.5f; /* ProductionSpeedFactor */
+                if (currentBillReport.workLeft <= 0) {
+                    ProduceItems();
+                    try {
+                        // HACK: bc we don't create a virtual pawn as RimFactory does, the record will be as if pawn operated on themselves %)
+                        Pawn billDoer = currentBillReport.medBill.GiverPawn;
+                        int op0 = billDoer.records.GetAsInt(RecordDefOf.OperationsPerformed);
+                        // tick workbench bill counters, like 'make 10 things'
+                        currentBillReport.bill.Notify_IterationCompleted(billDoer, currentBillReport.ingredients);
+                        // apply medical bill effects and results
+                        currentBillReport.medBill.Notify_IterationCompleted(billDoer, currentBillReport.ingredients);
+                        if( billDoer.records.GetAsInt(RecordDefOf.OperationsPerformed) != op0 ){
+                            // fix them back
+                            billDoer.records.AddTo(RecordDefOf.OperationsPerformed, -1);
+                        }
+                    } catch (Exception ex) {
+                        Log.Error("[!] TSS: error finishing " + currentBillReport.bill + ": " + ex);
+                    }
+                    currentBillReport = null;
+                }
+            } else if ( this.IsHashIntervalTick(60) ) {
+                //Start Bill if Possible
+                currentBillReport = TryGetNextBill();
+            }
+        }
+
+        // effects
+        if (currentBillReport != null && PowerOn){
+            if (recipeEffecter == null) {
+                recipeEffecter = currentBillReport.bill.recipe?.effectWorking?.Spawn();
+            }
+            if (recipeSound == null) {
+                recipeSound = currentBillReport.bill.recipe?.soundWorking?.TrySpawnSustainer(this);
+            }
+            if( (int)Find.CameraDriver.CurrentZoom == 0 ){
+                recipeEffecter?.EffectTick(this, this);
+            }
+            recipeSound?.SustainerUpdate();
+        } else {
+            if (recipeEffecter != null) {
+                recipeEffecter.Cleanup();
+                recipeEffecter = null;
+            }
+            if (recipeSound != null) {
+                recipeSound.End();
+                recipeSound = null;
+            }
+        }
     }
 }
