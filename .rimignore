@@ -2,6 +2,8 @@
 # files listed here will be skipped when mod is uploaded to the Steam Workshop
 TODO
 *.xcf
+*.blender
+blender_texture.png
 
 .DS_Store
 .git

@@ -34,7 +34,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             {
                 cachedTopGraphic = GraphicDatabase.Get<Graphic_Multi>("Things/Building/Misc/GrowthVat/GrowthVatTop",
                         ShaderDatabase.Transparent,
-                        new Vector2(1.2f,2.3f),
+                        new Vector2(1,2),
                         ForPrisoners ? TopColorPrisoner : TopColorNormal );
             }
             return cachedTopGraphic;
@@ -51,6 +51,18 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     private static readonly Vector2 BarSize = new Vector2(0.72f, 0.13f);
     private static readonly Material UnfilledMat = SolidColorMaterials.NewSolidColorMaterial(new Color(0.3f, 0.3f, 0.3f, 0.65f), ShaderDatabase.MetaOverlay);
     private static readonly Material FilledMat = SolidColorMaterials.NewSolidColorMaterial(new ColorInt(138, 3, 3).ToColor, ShaderDatabase.MetaOverlay);
+
+    public override Color DrawColorTwo {
+        get {
+            return ForPrisoners ? TopColorPrisoner : TopColorNormal;
+        }
+    }
+
+    public override Color DrawColor {
+        get {
+            return DrawColorTwo;
+        }
+    }
 
     public override void Draw()
     {

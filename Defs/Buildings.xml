@@ -156,7 +156,7 @@
       <texPath>Things/Building/CPS/TSS</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(4,4)</drawSize>
+      <drawSize>(5,4)</drawSize>
       <color>(136,145,89)</color>
     </graphicData>
     <rotatable>false</rotatable>
@@ -181,8 +181,6 @@
       <destroySound>BuildingDestroyed_Metal_Big</destroySound>
       <artificialForMeditationPurposes>false</artificialForMeditationPurposes>
       <ai_chillDestination>false</ai_chillDestination>
-      <bed_canBeMedical>false</bed_canBeMedical>
-      <bed_showSleeperBody>False</bed_showSleeperBody>
       <bed_healPerDay>4</bed_healPerDay>
       <!--isFence>true</isFence--> <!-- hack for TSS to have its own temperature -->
       <haulToContainerDuration>120</haulToContainerDuration>
