@@ -3,6 +3,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 using RimWorld.Planet;
+using System.Linq;
 
 namespace zed_0xff.CPS;
 
@@ -28,6 +29,19 @@ class Cache : WorldComponent
         foreach (IntVec3 cell in b.OccupiedRect()){
             mapPosHash[map.uniqueID][cell] = b;
         }
+    }
+
+    // null-safe
+    public static bool IsCabin(Room room){
+        if( room == null ) return false;
+
+        return Get(room.Cells.First(), room.Map) is Building_Cabin;
+    }
+
+    public static bool IsCabin(District d){
+        if( d == null ) return false;
+
+        return Get(d.Cells.First(), d.Map) is Building_Cabin;
     }
 
     // should be faster than ThingGrid.ThingAt<T>

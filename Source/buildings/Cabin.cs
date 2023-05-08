@@ -12,8 +12,7 @@ public class Building_Cabin : Building_Base {
 
     public CompTempControl compTempControl = null;
 
-    public override void SpawnSetup(Map map, bool respawningAfterLoad)
-    {
+    public override void SpawnSetup(Map map, bool respawningAfterLoad) {
         base.SpawnSetup(map, respawningAfterLoad);
         compTempControl = GetComp<CompTempControl>();
     }
