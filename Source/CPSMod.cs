@@ -54,7 +54,7 @@ public class CPSMod : Mod
         if (ModLister.HasActiveModWithName("Vanilla Races Expanded - Sanguophage")) {
             LoadPlugin(content, "VRES");
         }
-        if (ModLister.HasActiveModWithName("Dubs Bad Hygiene") || ModLister.HasActiveModWithName("Dubs Bad Hygiene Lite")) {
+        if (ModLister.HasActiveModWithName("Dubs Bad Hygiene")) {
             LoadPlugin(content, "DBH");
         }
 //        if( plugins.Any() ){

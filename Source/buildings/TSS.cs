@@ -169,7 +169,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             }
         }
 
-        if (ModLister.HasActiveModWithName("Dubs Bad Hygiene") || ModLister.HasActiveModWithName("Dubs Bad Hygiene Lite")) {
+        if (ModLister.HasActiveModWithName("Dubs Bad Hygiene")) {
             Type t = GenTypes.GetTypeInAnyAssembly("zed_0xff.CPS.Plugin_DBH");
             if( t != null ){
                 dbh = (IPlugin)Activator.CreateInstance(t, new object[] { this });

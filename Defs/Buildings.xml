@@ -257,9 +257,6 @@
       <li Class="DubsBadHygiene.CompProperties_Pipe" MayRequire="Dubwise.DubsBadHygiene">
         <mode>Sewage</mode>
       </li>
-      <li Class="DubsBadHygiene.CompProperties_Pipe" MayRequire="Dubwise.DubsBadHygiene.Lite">
-        <mode>Sewage</mode>
-      </li>
     </comps>
     <uiOrder>2010</uiOrder>
     <tickerType>Normal</tickerType>
