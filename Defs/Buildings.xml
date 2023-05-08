@@ -63,8 +63,9 @@
       <drawSize>(5.05,5.05)</drawSize>
     </graphicData>
     <size>(4,2)</size>
-    <hasInteractionCell>true</hasInteractionCell>
-    <interactionCellOffset>(-1,0,-1)</interactionCellOffset>
+    <!-- interaction cell position determines building room sometimes (at least in SocialProperness.cs) :( -->
+    <!--hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(-1,0,-1)</interactionCellOffset-->
     <canOverlapZones>false</canOverlapZones>
     <statBases>
       <WorkToBuild>8000</WorkToBuild>
@@ -90,8 +91,10 @@
       <isSittable>true</isSittable>
       <multiSittable>true</multiSittable>
     </building>
-    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
     <designationCategory>Furniture</designationCategory>
+    <surfaceType>Eat</surfaceType> <!-- allow them to eat inside the cabin -->
+    <socialPropernessMatters>true</socialPropernessMatters> <!-- stop regular pawns eating in a prison cabin -->
     <fillPercent>0.8</fillPercent>
     <drawGUIOverlay>true</drawGUIOverlay>
     <comps>

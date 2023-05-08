@@ -53,16 +53,27 @@ public class Building_Cabin : Building_Base {
         compTempControl.operatingAtHighPower = flag;
     }
 
+    // get cell for outer tempearature reading and pushing heat to
+    private IntVec3 getOuterCell(){
+        foreach (IntVec3 cell in this.OccupiedRect().ExpandedBy(1).EdgeCells){
+            if( !cell.Impassable(Map) )
+                return cell;
+        }
+        return IntVec3.Zero;
+    }
+
     // from Building_Cooler, adapted
     private void cool(float inTemp){
         if( !IsPowerOn() ) return;
-        if( !def.hasInteractionCell ){
-            Log.Warning("[!] CPS: cannot cool " + this + " because it has no interaction cell");
+
+        IntVec3 outerCell = getOuterCell();
+        if( outerCell == IntVec3.Zero ){
+            Log.Warning("[!] CPS: cannot cool " + this + " because it has no outer cell");
             return;
         }
 
         bool flag = false;
-        float outTemp = InteractionCell.GetTemperature(Map);
+        float outTemp = outerCell.GetTemperature(Map);
 
         float delta = outTemp - inTemp;
         if (inTemp > 40f) {
@@ -80,7 +91,7 @@ public class Building_Cabin : Building_Base {
         if (flag)
         {
             this.GetRoom().Temperature += num4;
-            GenTemperature.PushHeat(InteractionCell, Map, (0f - energyLimit) * 1.25f);
+            GenTemperature.PushHeat(outerCell, Map, (0f - energyLimit) * 1.25f);
         }
         
         CompProperties_Power props = compPowerTrader.Props;
@@ -103,7 +114,7 @@ public class Building_Cabin : Building_Base {
         float inTemp = AmbientTemperature;
         float outTemp = inTemp;
         if( def.hasInteractionCell ){
-            outTemp = InteractionCell.GetTemperature(Map);
+            outTemp = getOuterCell().GetTemperature(Map);
         }
 
         // in: 50, out: 27, target: 20
@@ -130,21 +141,21 @@ public class Building_Cabin : Building_Base {
     }
 
     // disable 'set for prisoners' gizmo if we're outside
-    public override IEnumerable<Gizmo> GetGizmos()
-    {
-        foreach (Gizmo gizmo in base.GetGizmos()){
-            if( gizmo is Command_Toggle ct && (ct.defaultLabel == pLabel || ct.icon == pIcon) ){
-                foreach (IntVec3 edgeCell in this.OccupiedRect().ExpandedBy(1).EdgeCells){
-                    Room room = edgeCell.GetRoom(Map);
-                    if( room != null && !RoomCanBePrisonCell(room)){
-                        ct.Disable();
-                        break;
-                    }
-                }
-            }
-            yield return gizmo;
-        }
-    }
+//    public override IEnumerable<Gizmo> GetGizmos()
+//    {
+//        foreach (Gizmo gizmo in base.GetGizmos()){
+//            if( gizmo is Command_Toggle ct && (ct.defaultLabel == pLabel || ct.icon == pIcon) ){
+//                foreach (IntVec3 edgeCell in this.OccupiedRect().ExpandedBy(1).EdgeCells){
+//                    Room room = edgeCell.GetRoom(Map);
+//                    if( room != null && !RoomCanBePrisonCell(room)){
+//                        ct.Disable();
+//                        break;
+//                    }
+//                }
+//            }
+//            yield return gizmo;
+//        }
+//    }
 
 }
 
