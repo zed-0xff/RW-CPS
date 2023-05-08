@@ -139,22 +139,18 @@ public class Building_Cabin : Building_Base {
         base.TickRare();
     }
 
-    // disable 'set for prisoners' gizmo if we're outside
-//    public override IEnumerable<Gizmo> GetGizmos()
-//    {
-//        foreach (Gizmo gizmo in base.GetGizmos()){
-//            if( gizmo is Command_Toggle ct && (ct.defaultLabel == pLabel || ct.icon == pIcon) ){
-//                foreach (IntVec3 edgeCell in this.OccupiedRect().ExpandedBy(1).EdgeCells){
-//                    Room room = edgeCell.GetRoom(Map);
-//                    if( room != null && !RoomCanBePrisonCell(room)){
-//                        ct.Disable();
-//                        break;
-//                    }
-//                }
-//            }
-//            yield return gizmo;
-//        }
-//    }
+    // remove hospitality
+    public override IEnumerable<Gizmo> GetGizmos() {
+        var lGuest = "CommandBedSetAsGuestLabel".Translate();
+        var dGuest = "CommandBedSetAsGuestDesc".Translate();
+
+        foreach (Gizmo gizmo in base.GetGizmos()){
+            if( gizmo is Command_Toggle ct && (ct.defaultLabel == lGuest || ct.defaultDesc == dGuest) ){
+                continue;
+            }
+            yield return gizmo;
+        }
+    }
 
 }
 
