@@ -59,7 +59,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 EjectAll();
                 forOwnerType = value;
                 cachedTopGraphic = null;
-                //Notify_ColorChanged();
+                Notify_ColorChanged();
                 NotifyRoomBedTypeChanged();
             }
         }
@@ -94,7 +94,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 Log.Error("Bed ForPrisoners=false, but should it be for for colonists or slaves?  Set ForOwnerType instead.");
             }
             cachedTopGraphic = null;
-            //Notify_ColorChanged();
+            Notify_ColorChanged();
             NotifyRoomBedTypeChanged();
         }
     }
