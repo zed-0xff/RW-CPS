@@ -178,7 +178,7 @@ Pawns are stored in the individual capsules, in a conveyor-like rotating facilit
 Their basic needs are satisfied, but don't expect them to be happy while inside the TSS.
 The space is tight and forced sleep causes nightmares.
 
-NB: Keep it powered at all times.
+NB: The manufacturer is not responsible for any injury, harm, or damage suffered as a result of TSS kept without power for more than 2 hours.
 
 Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
     <thingClass>zed_0xff.CPS.Building_TSS</thingClass>
@@ -239,7 +239,7 @@ Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
       </defaultStorageSettings>
     </building>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
-    <designationCategory>Furniture</designationCategory>
+    <designationCategory>VCHE_PipeNetworks</designationCategory>
     <fillPercent>0.8</fillPercent>
     <drawGUIOverlay>true</drawGUIOverlay>
     <comps>
