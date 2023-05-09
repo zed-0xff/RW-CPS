@@ -291,13 +291,13 @@
     </inspectorTabs>
 
     <recipes>
-      <li>CPS_DrawBlood_HemogenFarmPrisoners</li>
-      <li>CPS_DrawBlood_AllPrisoners</li>
-      <li>CPS_DrawBlood_Slaves</li>
-      <li>CPS_DrawBlood_All</li>
-      <li>CPS_BloodTransfusion_Colonists_50</li>
-      <li>CPS_BloodTransfusion_Colonists_100</li>
-      <li>CPS_BloodTransfusion_All_50</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_DrawBlood_HemogenFarmPrisoners</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_DrawBlood_AllPrisoners</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_DrawBlood_Slaves</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_DrawBlood_All</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_BloodTransfusion_Colonists_50</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_BloodTransfusion_Colonists_100</li>
+      <li MayRequire="Ludeon.RimWorld.Biotech">CPS_BloodTransfusion_All_50</li>
     </recipes>
 
   </ThingDef>

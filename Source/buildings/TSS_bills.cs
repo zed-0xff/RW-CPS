@@ -42,6 +42,8 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         }
     }
 
+    static Dictionary<RecipeDef, PatientType> recipeMap = new Dictionary<RecipeDef, PatientType>();
+
     protected BillReport currentBillReport;
 
     private BillStack billStack = null;
@@ -98,18 +100,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         Recipient_Colonist_50,
         Recipient_Colonist_100,
         Recipient_All_50
-    };
-
-    static readonly Dictionary<RecipeDef, PatientType> recipeMap  = new Dictionary<RecipeDef, PatientType>()
-    {
-        { VDefOf.CPS_DrawBlood_HemogenFarmPrisoners, PatientType.Donor_HemogenFarmPrisoner },
-        { VDefOf.CPS_DrawBlood_AllPrisoners,         PatientType.Donor_Prisoner },
-        { VDefOf.CPS_DrawBlood_Slaves,               PatientType.Donor_Slave },
-        { VDefOf.CPS_DrawBlood_All,                  PatientType.Donor_Any },
-
-        { VDefOf.CPS_BloodTransfusion_Colonists_50,  PatientType.Recipient_Colonist_50 },
-        { VDefOf.CPS_BloodTransfusion_Colonists_100, PatientType.Recipient_Colonist_100 },
-        { VDefOf.CPS_BloodTransfusion_All_50,        PatientType.Recipient_All_50 },
     };
 
     // TryGetNextBill returns a new BillReport to start if one is available

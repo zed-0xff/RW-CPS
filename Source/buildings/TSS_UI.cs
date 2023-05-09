@@ -32,7 +32,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         {
             if (cachedTopGraphic == null || Prefs.DevMode )
             {
-                cachedTopGraphic = GraphicDatabase.Get<Graphic_Multi>("Things/Building/Misc/GrowthVat/GrowthVatTop",
+                cachedTopGraphic = GraphicDatabase.Get<Graphic_Multi>("Things/Building/CPS/GrowthVatTop",
                         ShaderDatabase.Transparent,
                         new Vector2(1,2),
                         ForPrisoners ? TopColorPrisoner : TopColorNormal );
@@ -107,7 +107,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         }
     }
 
-    private static readonly Texture2D InsertIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/InsertPawn");
+    private static readonly Texture2D InsertIcon = ContentFinder<Texture2D>.Get("UI/Gizmos/CPS_InsertPawn");
     private static readonly Texture2D CancelIcon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel");
 
     public override IEnumerable<Gizmo> GetGizmos()

@@ -15,4 +15,14 @@
     <allowOpportunisticPrefix>true</allowOpportunisticPrefix>
   </JobDef>
 
+  <JobDef>
+    <defName>CaptureToTSS</defName>
+    <driverClass>zed_0xff.CPS.JobDriver_CarryToMultiBuilding</driverClass>
+    <reportString>capturing TargetA.</reportString>
+    <alwaysShowWeapon>true</alwaysShowWeapon>
+    <makeTargetPrisoner>true</makeTargetPrisoner>
+    <casualInterruptible>false</casualInterruptible>
+    <carryThingAfterJob>true</carryThingAfterJob>
+  </JobDef>
+
 </Defs>

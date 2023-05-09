@@ -175,6 +175,17 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 dbh = (IPlugin)Activator.CreateInstance(t, new object[] { this });
             }
         }
+
+        if( recipeMap.Count == 0 && ModsConfig.BiotechActive ){
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_DrawBlood_HemogenFarmPrisoners")] = PatientType.Donor_HemogenFarmPrisoner;
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_DrawBlood_AllPrisoners")]         = PatientType.Donor_Prisoner;
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_DrawBlood_Slaves")]               = PatientType.Donor_Slave;
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_DrawBlood_All")]                  = PatientType.Donor_Any;
+
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_BloodTransfusion_Colonists_50")]  = PatientType.Recipient_Colonist_50;
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_BloodTransfusion_Colonists_100")] = PatientType.Recipient_Colonist_100;
+            recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_BloodTransfusion_All_50")]        = PatientType.Recipient_All_50;
+        }
     }
 
     private IPlugin dbh = null;
