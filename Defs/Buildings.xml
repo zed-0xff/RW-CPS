@@ -75,7 +75,7 @@ Can fit up to 10 pawns in 4x2 space.</description>
       <texPath>Things/Building/CPS/Cabin</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
       <shaderType>CutoutComplex</shaderType>
-      <drawSize>(5.05,5.05)</drawSize>
+      <drawSize>(5,5)</drawSize>
     </graphicData>
     <size>(4,2)</size>
     <!-- interaction cell position determines building room sometimes (at least in SocialProperness.cs) :( -->
