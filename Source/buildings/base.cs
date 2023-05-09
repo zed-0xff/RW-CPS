@@ -67,9 +67,9 @@ public abstract class Building_Base : Building_Bed {
             base.DeSpawn(mode);
             if (district != null) {
                 district.Notify_RoomShapeOrContainedBedsChanged();
-                if( district.Room != null ){ // <-- in fact, only this check is important here
-                    district.Room.Notify_RoomShapeChanged();
-                }
+//                if( district.Room != null ){ // <-- in fact, only this check is important here
+//                    district.Room.Notify_RoomShapeChanged();
+//                }
             }
         } else {
             // regular building

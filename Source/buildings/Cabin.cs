@@ -17,15 +17,9 @@ public class Building_Cabin : Building_Base {
 
     public override Color DrawColorTwo {
         get {
-            return ForPrisoners ? DrawColor : Color.black;
+            return ForPrisoners ? Color.gray : Color.black;
         }
     }
-
-//    public override Color DrawColor {
-//        get {
-//            return DrawColorTwo;
-//        }
-//    }
 
     public override void SpawnSetup(Map map, bool respawningAfterLoad) {
         base.SpawnSetup(map, respawningAfterLoad);
