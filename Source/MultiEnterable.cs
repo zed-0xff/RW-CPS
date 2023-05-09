@@ -17,13 +17,18 @@ public abstract class Building_MultiEnterable : Building_Enterable {
         }
     }
 
-    protected override void SelectPawn(Pawn pawn)
+    public void SelectPawn2(Pawn pawn)
     {
         selectedPawns.Add(pawn);
         if (!pawn.IsPrisonerOfColony && !pawn.Downed)
         {
             pawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VDefOf.EnterMultiBuilding, this), JobTag.Misc);
         }
+    }
+
+    protected override void SelectPawn(Pawn pawn)
+    {
+        SelectPawn2(pawn);
     }
 
     public override void DrawExtraSelectionOverlays()

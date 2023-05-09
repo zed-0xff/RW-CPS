@@ -4,4 +4,5 @@
   <AutoDeliverHemogenDesc>This determines whether pawns will automatically deliver hemogen packs when stored hemogen is below {MIN}.\n\nAutomatic delivery is currently {ONOFF}.</AutoDeliverHemogenDesc>
   <DeliverHemogenBelow>Deliver hemogen below</DeliverHemogenBelow>
   <NeverDeliverHemogen>Never deliver hemogen.</NeverDeliverHemogen>
+  <CaptureToTSS>Capture {1_label} to TSS</CaptureToTSS>
 </LanguageData>

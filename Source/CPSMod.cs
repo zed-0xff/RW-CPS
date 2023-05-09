@@ -7,31 +7,32 @@ using UnityEngine;
 
 namespace zed_0xff.CPS;
 
+//public enum BuildingType { Bed, TSS, Cabin, ThePit };
+
 public class CPSSettings : ModSettings
 {
     public class TSSSettings : IExposable {
         public bool sounds = true;
         public bool effects = true;
+        public bool menus = true;
 
         public void ExposeData() {
             Scribe_Values.Look(ref sounds, "sounds", true);
             Scribe_Values.Look(ref effects, "effects", true);
+            Scribe_Values.Look(ref menus, "menus", true);
         }
     };
 
-//    public class CommonSettings {
-//        public bool debugLog = false;
-//
-//        public virtual void ExposeData(){
-//            Scribe_Values.Look(ref debugLog, "debugLog", false);
-//        }
-//    }
-
     public TSSSettings tss = new TSSSettings();
+
+//    public List<BuildingType> prisonerBedOrder = new List<BuildingType>{ BuildingType.Bed, BuildingType.TSS, BuildingType.Cabin, BuildingType.ThePit };
+//    public bool customPrisonerBedOrder = true;
 
     public override void ExposeData()
     {
         Scribe_Deep.Look(ref tss, "TSS");
+//        Scribe_Collections.Look(ref prisonerBedOrder, "prisonerBedOrder", LookMode.Value);
+//        Scribe_Values.Look(ref customPrisonerBedOrder, "customPrisonerBedOrder", true); // TODO: add checkbox
         base.ExposeData();
     }
 }
@@ -91,10 +92,8 @@ public class CPSMod : Mod
         Widgets.DrawMenuSection(mainRect);
 
         var tabs = new List<TabRecord> {
-            new TabRecord("TSS".Translate(), () => {
-                PageIndex = 0;
-                WriteSettings();
-            }, PageIndex == 0),
+            new TabRecord("General".Translate(), () => { PageIndex = 0; WriteSettings(); }, PageIndex == 0),
+            new TabRecord("TSS".Translate(),     () => { PageIndex = 1; WriteSettings(); }, PageIndex == 1),
         };
 
         TabDrawer.DrawTabs(tabRect, tabs);
@@ -102,23 +101,82 @@ public class CPSMod : Mod
         switch (PageIndex)
         {
             case 0:
-                draw_TSSSettings(mainRect.ContractedBy(15f));
+                draw_general(mainRect.ContractedBy(15f));
+                break;
+            case 1:
+                draw_tss(mainRect.ContractedBy(15f));
                 break;
             default:
                 break;
         }
     }
 
-    private void draw_TSSSettings(Rect inRect){
+//    void Reorder(BuildingType t, int delta){
+//        int index = Settings.prisonerBedOrder.IndexOf(t);
+//        if( delta == -1 && index > 0 ){
+//            BuildingType tmp = Settings.prisonerBedOrder[index-1];
+//            Settings.prisonerBedOrder[index-1] = Settings.prisonerBedOrder[index];
+//            Settings.prisonerBedOrder[index] = tmp;
+//        }
+//        if( delta == 1 && index < Settings.prisonerBedOrder.Count - 1 ){
+//            BuildingType tmp = Settings.prisonerBedOrder[index+1];
+//            Settings.prisonerBedOrder[index+1] = Settings.prisonerBedOrder[index];
+//            Settings.prisonerBedOrder[index] = tmp;
+//        }
+//    }
+
+//    void DrawThingRow(ref float y, float width, BuildingType t){
+//        Rect rect = new Rect(0f, y, width, 28f);
+//        string text;
+//        switch( t ){
+//            case BuildingType.Bed:
+//                text = "Regular bed".Translate();
+//                break;
+//            case BuildingType.ThePit:
+//                text = "The Pit".Translate();
+//                break;
+//            default:
+//                text = t.ToString().Translate();
+//                break;
+//        }
+//        Widgets.Label(rect, text);
+//
+//        Rect buttonRect = new Rect(rect.width - 48f, y, 24f, 24f);
+//        if( Widgets.ButtonImage(buttonRect, TexButton.ReorderUp) ){
+//            Reorder(t, -1);
+//        }
+//
+//        buttonRect = new Rect(rect.width - 24f, y, 24f, 24f);
+//        if( Widgets.ButtonImage(buttonRect, TexButton.ReorderDown) ){
+//            Reorder(t, 1);
+//        }
+//
+//        y += 28f;
+//    }
+
+    void draw_general(Rect inRect){
         Listing_Standard l = new Listing_Standard();
-        var viewRect = new Rect(0f, 0f, inRect.width - 60, 200f); // XXX manual height :(
-        Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
-        l.Begin(viewRect);
+        l.Begin(inRect);
+
+//        float curY = 0f;
+//        var tmpList = new List<BuildingType>();
+//        tmpList.AddRange(Settings.prisonerBedOrder); // Collection was modified blah blah
+//        Widgets.ListSeparator(ref curY, inRect.width, "Prisoner bed search order");
+//        foreach( BuildingType t in tmpList ){
+//            DrawThingRow(ref curY, 200f, t);
+//        }
+
+        l.End();
+    }
+
+    void draw_tss(Rect inRect){
+        Listing_Standard l = new Listing_Standard();
+        l.Begin(inRect);
 
         l.CheckboxLabeled("Sounds", ref Settings.tss.sounds);
         l.CheckboxLabeled("Effects", ref Settings.tss.effects);
+        l.CheckboxLabeled("Context menus", ref Settings.tss.menus);
 
         l.End();
-        Widgets.EndScrollView();
     }
 }
