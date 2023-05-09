@@ -18,12 +18,11 @@ public static class Patch_AddHumanlikeOrders {
                 PathEndMode.InteractionCell,
                 TraverseParms.For(pawn),
                 9999f,
-                (Thing b) => ((Building_TSS)b).CanAcceptPawn(targetPawn)
+                (Thing b) => ((Building_TSS)b).CanAcceptPawn(targetPawn, forcePrisoner: true)
                 );
     }
 
     static void CaptureToTSS(Pawn targetPawn, Pawn pawn){
-
         Building_TSS tss = GetClosestTSS(targetPawn, pawn);
 
         if (tss == null) {
@@ -39,19 +38,46 @@ public static class Patch_AddHumanlikeOrders {
         }
     }
 
+    static void ArrestToTSS(Pawn targetPawn, Pawn pawn){
+        Building_TSS tss = GetClosestTSS(targetPawn, pawn);
+
+        if (tss == null) {
+            Messages.Message("CannotArrest".Translate() + ": " + "NoPrisonerBed".Translate(), targetPawn, MessageTypeDefOf.RejectInput, historical: false);
+        } else {
+            tss.SelectPawn2(targetPawn);
+            Job job = JobMaker.MakeJob(VDefOf.ArrestToTSS, targetPawn, tss);
+            job.count = 1;
+            pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+        }
+    }
+
     static void Postfix(Pawn pawn, List<FloatMenuOption> opts){
         if( !CPSMod.Settings.tss.menus ) return;
         if( pawn == null ) return;
 
-        for( int i=0; i<opts.Count; i++){
+        int n = opts.Count;
+        for( int i=0; i<n; i++ ){
             var opt = opts[i];
             if( !(opt.revalidateClickTarget is Pawn targetPawn) ) continue;
-            string sCapture = "Capture".Translate(targetPawn.LabelCap, targetPawn);
 
-            if( opt.Label.StartsWith(sCapture) && GetClosestTSS(targetPawn, pawn) != null ){
-                TaggedString sCaptureToTSS = "CaptureToTSS".Translate(targetPawn.LabelCap, targetPawn);
-                opts.Insert(i+1, FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(sCaptureToTSS, delegate{ CaptureToTSS(targetPawn, pawn); }, MenuOptionPriority.RescueOrCapture, null, targetPawn), pawn, targetPawn));
-                break;
+            string sCapture = "Capture".Translate(targetPawn.LabelCap, targetPawn);
+            if( opt.Label == sCapture ){
+                if( GetClosestTSS(targetPawn, pawn) != null ){
+                    TaggedString sCaptureToTSS = "CaptureToTSS".Translate(targetPawn.LabelCap, targetPawn);
+                    opts.Insert(i+1, FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(sCaptureToTSS, delegate{ CaptureToTSS(targetPawn, pawn); }, MenuOptionPriority.RescueOrCapture, null, targetPawn), pawn, targetPawn));
+                    n++;
+                    i++;
+                }
+            } else {
+                string sArrest = "TryToArrest".Translate(targetPawn.LabelCap, targetPawn, targetPawn.GetAcceptArrestChance(pawn).ToStringPercent());
+                if( opt.Label == sArrest ){
+                    if( GetClosestTSS(targetPawn, pawn) != null ){
+                        TaggedString sArrestToTSS = "ArrestToTSS".Translate(targetPawn.LabelCap, targetPawn);
+                        opts.Insert(i+1, FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(sArrestToTSS, delegate{ ArrestToTSS(targetPawn, pawn); }, MenuOptionPriority.High, null, targetPawn), pawn, targetPawn));
+                        n++;
+                        i++;
+                    }
+                }
             }
         }
     }

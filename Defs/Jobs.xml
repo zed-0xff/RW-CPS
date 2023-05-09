@@ -25,4 +25,14 @@
     <carryThingAfterJob>true</carryThingAfterJob>
   </JobDef>
 
+  <JobDef>
+    <defName>ArrestToTSS</defName>
+    <driverClass>zed_0xff.CPS.JobDriver_TakeToTSS</driverClass>
+    <reportString>arresting TargetA.</reportString>
+    <alwaysShowWeapon>true</alwaysShowWeapon>
+    <makeTargetPrisoner>true</makeTargetPrisoner>
+    <casualInterruptible>false</casualInterruptible>
+    <carryThingAfterJob>true</carryThingAfterJob>
+  </JobDef>
+
 </Defs>

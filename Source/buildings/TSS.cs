@@ -245,9 +245,14 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
     public override Vector3 PawnDrawOffset => Vector3.zero;
 
-    public override AcceptanceReport CanAcceptPawn(Pawn pawn)
-    {
-        if (!pawn.IsColonist && !pawn.IsSlaveOfColony && !pawn.IsPrisonerOfColony)
+    public override AcceptanceReport CanAcceptPawn(Pawn pawn){
+        return CanAcceptPawn(pawn, false);
+    }
+
+    public AcceptanceReport CanAcceptPawn(Pawn pawn, bool forcePrisoner) {
+        bool pawnIsPrisoner = pawn.IsPrisonerOfColony || forcePrisoner;
+
+        if (!pawn.IsColonist && !pawn.IsSlaveOfColony && !pawnIsPrisoner)
         {
             return false;
         }
@@ -263,10 +268,10 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         {
             return "NoPower".Translate().CapitalizeFirst();
         }
-        if( ForPrisoners && !pawn.IsPrisonerOfColony ){
+        if( ForPrisoners && !pawnIsPrisoner ){
             return "ForPrisonerUse".Translate().CapitalizeFirst();
         }
-        if( !ForPrisoners && pawn.IsPrisonerOfColony ){
+        if( !ForPrisoners && pawnIsPrisoner ){
             return "ForColonistUse".Translate().CapitalizeFirst();
         }
         return true;

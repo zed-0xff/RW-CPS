@@ -17,11 +17,11 @@ public abstract class Building_MultiEnterable : Building_Enterable {
         }
     }
 
-    public void SelectPawn2(Pawn pawn)
+    // SelectPawn() is protected, cannot change it's visibility bc it's inherited, so this is public
+    public void SelectPawn2(Pawn pawn, bool makeJob = true)
     {
         selectedPawns.Add(pawn);
-        if (!pawn.IsPrisonerOfColony && !pawn.Downed)
-        {
+        if ( makeJob && pawn.IsColonistPlayerControlled && !pawn.Downed ) {
             pawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(VDefOf.EnterMultiBuilding, this), JobTag.Misc);
         }
     }

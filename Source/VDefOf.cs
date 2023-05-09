@@ -14,4 +14,5 @@ public static class VDefOf
     public static JobDef EnterMultiBuilding;
     public static JobDef CarryToMultiBuilding;
     public static JobDef CaptureToTSS;
+    public static JobDef ArrestToTSS;
 }
