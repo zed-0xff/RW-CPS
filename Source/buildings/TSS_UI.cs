@@ -311,7 +311,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             stringBuilder.AppendLineIfNotEmpty().Append("TSS_BillReport".Translate(currentBillReport.bill.Label.ToString(), currentBillReport.workLeft.ToStringWorkAmount()));
         }
         if( Prefs.DevMode ){
-            stringBuilder.AppendLineIfNotEmpty().Append("Ticks without power: " + ticksWithoutPower);
+            stringBuilder.AppendLineIfNotEmpty().Append("Ticks without power: " + (Find.TickManager.TicksGame - lastTickWithPower) );
         }
         return stringBuilder.ToString();
     }

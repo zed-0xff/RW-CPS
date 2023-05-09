@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Text;
 using RimWorld;
 using Verse;
-using UnityEngine;
 using Verse.AI;
 using Verse.Sound;
+using UnityEngine;
 
 namespace zed_0xff.CPS;
 
@@ -16,7 +16,7 @@ namespace zed_0xff.CPS;
 public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParent, IThingHolderWithDrawnPawn, IBillTab, IBillGiver {
     public /*override*/ int MaxSlots => 16;
 
-    private int ticksWithoutPower = 0;
+    private int lastTickWithPower = 0;
     private int curOffset = 0;
     private int nPawns = 0;
 
@@ -362,7 +362,22 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 topPawns = null;
                 nPawns = np;
             }
+        } else {
+            // check for ejected pawns, tick resting
+            int np = 0;
+            foreach( Thing t in innerContainer ) {
+                if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
+                    np++;
+                    // no rest
+                }
+            }
+            if( np != nPawns ){
+                // someone was ejected
+                topPawns = null;
+                nPawns = np;
+            }
         }
+
         base.Tick();
         innerContainer.ThingOwnerTick();
 
@@ -391,7 +406,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             rotate();
 
         if( PowerOn ){
-            ticksWithoutPower = 0;
+            lastTickWithPower = Find.TickManager.TicksGame;
             feedOccupants();
 
             if (this.IsHashIntervalTick(2500)) {
@@ -411,12 +426,35 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 }
             }
         } else {
-            ticksWithoutPower += 250; // XXX wrong to assume we had 250 ticks since last call
-            if( ticksWithoutPower >= 10000 ){ // 4 ingame hours, ~3 minutes IRL
-                EjectAll();
+            if( IsInternalBatteryEmpty() ){
+                LocalTargetInfo target = this;
+                foreach( Thing t in innerContainer ){
+                    if( t is Pawn pawn && pawn.InAggroMentalState ){
+                        var verb = pawn.TryGetAttackVerb(this);
+                        if( verb == null ) continue;
+
+                        verb.TryStartCastOn(target);
+                        if( verb is Verb_MeleeAttackDamage dmg ){
+                            // from Verb_MeleeAttackDamage.DamageInfosToApply
+                            float num = dmg.verbProps.AdjustedMeleeDamageAmount(dmg, pawn);
+                            float armorPenetration = dmg.verbProps.AdjustedArmorPenetration(dmg, pawn);
+                            num = Rand.Range(num * 0.8f, num * 1.2f);
+                            var source = pawn.def;
+                            bool instigatorGuilty = true;
+                            DamageInfo damageInfo = new DamageInfo(DamageDefOf.Blunt, num, armorPenetration, -1f, pawn, null, source, DamageInfo.SourceCategory.ThingOrUnknown, null, instigatorGuilty);
+                            this.TakeDamage(damageInfo);
+                            damageInfo.SetAmount(num/4);
+                            pawn.TakeDamage(damageInfo);
+                        }
+                    }
+                }
             }
         }
         //base.TickRare(); // don't call base because we call TickRare() from Tick() ourselves (questionable)
+    }
+
+    public bool IsInternalBatteryEmpty(){
+        return lastTickWithPower != 0 && Find.TickManager.TicksGame - lastTickWithPower > GenDate.TicksPerHour*2;
     }
 
     void EjectAll(){
@@ -438,7 +476,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         base.ExposeData();
         Scribe_Deep.Look(ref allowedNutritionSettings, "allowedNutritionSettings");
         Scribe_Values.Look(ref forOwnerType, "forOwnerType", BedOwnerType.Colonist);
-        Scribe_Values.Look(ref ticksWithoutPower, "ticksWithoutPower", 0);
+        Scribe_Values.Look(ref lastTickWithPower, "lastTickWithPower", 0);
 
         Scribe_Deep.Look(ref billStack, "bills", this);
         Scribe_Deep.Look(ref currentBillReport, "currentBillReport");
