@@ -12,6 +12,21 @@ public class Building_Cabin : Building_Base {
 
     public CompTempControl compTempControl = null;
 
+    static readonly Color TopColorNormal = new Color(0.6313726f, 71f / 85f, 0.7058824f);
+    static readonly Color TopColorPrisoner = new Color(1f, 61f / 85f, 11f / 85f);
+
+    public override Color DrawColorTwo {
+        get {
+            return ForPrisoners ? DrawColor : Color.black;
+        }
+    }
+
+//    public override Color DrawColor {
+//        get {
+//            return DrawColorTwo;
+//        }
+//    }
+
     public override void SpawnSetup(Map map, bool respawningAfterLoad) {
         base.SpawnSetup(map, respawningAfterLoad);
         compTempControl = GetComp<CompTempControl>();
