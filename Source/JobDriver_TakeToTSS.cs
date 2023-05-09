@@ -20,7 +20,7 @@ public class JobDriver_TakeToTSS : JobDriver
 	{
 		get
 		{
-			if (Takee.RaceProps.Humanlike && job.def != JobDefOf.Arrest && !Takee.IsPrisonerOfColony)
+			if (Takee.RaceProps.Humanlike && job.def != VDefOf.ArrestToTSS && !Takee.IsPrisonerOfColony)
 			{
 				if (Takee.ageTracker.CurLifeStage.alwaysDowned)
 				{
@@ -71,7 +71,7 @@ public class JobDriver_TakeToTSS : JobDriver
                 DropTSS.SelectedPawns.Add(Takee);
                 });
 		Toil goToTakee = Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.ClosestTouch).FailOnDespawnedNullOrForbidden(TargetIndex.A).FailOnDespawnedNullOrForbidden(TargetIndex.B)
-			.FailOn(() => job.def == JobDefOf.Arrest && !Takee.CanBeArrestedBy(pawn))
+			.FailOn(() => job.def == VDefOf.ArrestToTSS && !Takee.CanBeArrestedBy(pawn))
 			.FailOn(() => !pawn.CanReach(DropTSS, PathEndMode.InteractionCell, Danger.Deadly))
 			.FailOn(() => (job.def == JobDefOf.Rescue || job.def == JobDefOf.Capture) && !Takee.Downed)
 			.FailOnSomeonePhysicallyInteracting(TargetIndex.A);
@@ -91,7 +91,7 @@ public class JobDriver_TakeToTSS : JobDriver
 						QuestUtility.SendQuestTargetSignals(pawn.Faction.questTags, "FactionMemberArrested", pawn.Faction.Named("FACTION"));
 					}
 				}
-				if (job.def == JobDefOf.Arrest && !pawn.CheckAcceptArrest(base.pawn))
+				if (job.def == VDefOf.ArrestToTSS && !pawn.CheckAcceptArrest(base.pawn))
 				{
 					base.pawn.jobs.EndCurrentJob(JobCondition.Incompletable);
 				}
