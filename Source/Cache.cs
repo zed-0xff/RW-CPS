@@ -22,7 +22,6 @@ class Cache : WorldComponent
     }
 
     public static void Add(Building_Base b, Map map){
-        if( Prefs.DevMode ) Log.Message("[d] CPS: add " + b);
         if( !mapPosHash.ContainsKey(map.uniqueID) ){
             mapPosHash.Add(map.uniqueID, new Dictionary<IntVec3, Building_Base>());
         }
@@ -62,7 +61,6 @@ class Cache : WorldComponent
     }
 
     public static void Remove(Building_Base b){
-        if( Prefs.DevMode ) Log.Message("[d] CPS: removing " + b);
         if( mapPosHash.ContainsKey(b.Map.uniqueID) ){
             foreach (IntVec3 cell in b.OccupiedRect()){
                 mapPosHash[b.Map.uniqueID][cell] = null;

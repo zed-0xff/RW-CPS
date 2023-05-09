@@ -4,7 +4,14 @@
   <ThingDef ParentName="BuildingBase">
     <defName>CPS_ThePit</defName>
     <label>the pit</label>
-    <description>blah blah</description>
+    <description>Just a deep hole in the ground.
+
+Very easy to build. Very dirty. Very uncomfortable.
+Very high chance of infections and tantrums.
+    
+Can be built outside. Prisoners will not be able to escape unless they have some superjump or teleport abilities.
+
+Can fit up to 5 prisoners in 2x2 space.</description>
     <thingClass>zed_0xff.CPS.Building_ThePit</thingClass>
     <graphicData>
       <texPath>Things/Building/CPS/ThePit_south</texPath>
@@ -54,7 +61,15 @@
   <ThingDef ParentName="BuildingBase">
     <defName>CPS_Cabin</defName>
     <label>cabin</label>
-    <description>blah blah</description>
+    <description>High density housing with integrated temperature controls.
+
+Soundproof from outside noises.
+Has some comfort. Movable.
+Pawns can eat inside if they don't have any better tables.
+
+Can be assigned to prisoners, but needs extra outside walls or high fences to contain them.
+
+Can fit up to 10 pawns in 4x2 space.</description>
     <thingClass>zed_0xff.CPS.Building_Cabin</thingClass>
     <graphicData>
       <texPath>Things/Building/CPS/Cabin</texPath>
@@ -92,7 +107,7 @@
       <multiSittable>true</multiSittable>
     </building>
     <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
-    <designationCategory>Furniture</designationCategory>
+    <designationCategory>Structure</designationCategory>
     <surfaceType>Eat</surfaceType> <!-- allow them to eat inside the cabin -->
     <socialPropernessMatters>true</socialPropernessMatters> <!-- stop regular pawns eating in a prison cabin -->
     <fillPercent>0.8</fillPercent>
@@ -135,8 +150,7 @@
       <li>Woody</li>
     </stuffCategories>
     <researchPrerequisites>
-      <li>ComplexFurniture</li>
-      <li>AirConditioning</li>
+      <li>CPS_Cabin</li>
     </researchPrerequisites>
     <constructionSkillPrerequisite>5</constructionSkillPrerequisite>
     <castEdgeShadows>true</castEdgeShadows>
@@ -153,14 +167,26 @@
   <ThingDef ParentName="BuildingBase">
     <defName>CPS_TSS</defName>
     <label>test subject storage</label>
-    <description>blah blah</description>
+    <description>TSS: Test Subject Storage.
+
+Integrated automatic temperature controls.
+Nutrient paste autofeeding (optionally connects to the &lt;color=#ffe185&gt;VNPE&lt;/color&gt; pipe network).
+Blood draw and transfusion options (needs &lt;color=#a2c8ff&gt;Biotech&lt;/color&gt; and, optionally, &lt;color=#ffe185&gt;VRE-S&lt;/color&gt;)
+Connects to the &lt;color=#ffe185&gt;DBH&lt;/color&gt; hygiene network if it's available.
+
+Pawns are stored in the individual capsules, in a conveyor-like rotating facility.
+Their basic needs are satisfied, but don't expect them to be happy while inside the TSS.
+The space is tight and forced sleep causes nightmares.
+
+NB: Keep it powered at all times.
+
+Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
     <thingClass>zed_0xff.CPS.Building_TSS</thingClass>
     <graphicData>
       <texPath>Things/Building/CPS/TSS</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(5,4)</drawSize>
-      <color>(136,145,89)</color>
     </graphicData>
     <rotatable>false</rotatable>
     <drawerType>MapMeshAndRealTime</drawerType>
@@ -272,10 +298,7 @@
       <ComponentSpacer>16</ComponentSpacer>
     </costList>
     <researchPrerequisites>
-      <li>Cryptosleep</li>
-      <li>VitalsMonitor</li>
-      <li>NutrientPaste</li>
-      <li>SterileMaterials</li>
+      <li>CPS_TSS</li>
     </researchPrerequisites>
     <constructionSkillPrerequisite>12</constructionSkillPrerequisite>
     <castEdgeShadows>true</castEdgeShadows>

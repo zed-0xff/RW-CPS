@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ResearchTabDef>
+    <defName>CPS</defName>
+    <label>CPS</label>
+  </ResearchTabDef>
+
+  <ResearchProjectDef>
+    <defName>CPS_Cabin</defName>
+    <label>Cabin</label>
+    <tab>CPS</tab>
+    <description>Learn how to build high density housings with integrated temperature controls.</description>
+    <baseCost>500</baseCost>
+    <techLevel>Industrial</techLevel>
+    <prerequisites>
+      <li>ComplexFurniture</li>
+      <li>AirConditioning</li>
+    </prerequisites>
+    <researchViewX>0.00</researchViewX>
+    <researchViewY>0.70</researchViewY>
+  </ResearchProjectDef>
+
+  <ResearchProjectDef>
+    <defName>CPS_TSS</defName>
+    <label>TSS</label>
+    <tab>CPS</tab>
+    <description>Construct massive Test Subject Storage facilities that can hold upto 16 pawns.
+Has integrated automatic temperature controls, nutrient paste autofeeding, blood draw and transfusion options.
+Also connects to the hygiene network if it's available.</description>
+    <baseCost>2000</baseCost>
+    <techLevel>Spacer</techLevel>
+    <prerequisites>
+      <li>Cryptosleep</li>
+      <li>VitalsMonitor</li>
+      <li>NutrientPaste</li>
+      <li>SterileMaterials</li>
+    </prerequisites>
+    <researchViewX>1.00</researchViewX>
+    <researchViewY>0.70</researchViewY>
+  </ResearchProjectDef>
+
+</Defs>
