@@ -39,6 +39,22 @@ public partial class Building_TSS {
         private static readonly FastInvokeHandler selectPawn = MethodInvoker.GetHandler(m_selectPawn);
 
         private void autoEject(){
+            if( bAutoEjectTendable ){
+                foreach( Thing t in tss.innerContainer ){
+                    if( !(t is Pawn pawn) ) continue;
+                    if( !HealthAIUtility.ShouldEverReceiveMedicalCareFromPlayer(pawn) ) continue; // healthcare is set to 'no medical care'
+
+                    if( pawn.health.HasHediffsNeedingTend() ){
+                        if( bOnlyIfEnoughMedBeds ){
+                            if( !tss.Map.listerBuildings.allBuildingsColonist.Any((Building x) => x is Building_Bed b && b.Medical && RestUtility.CanUseBedNow(b, pawn, true))){
+                                continue; // no medical beds
+                            }
+                        }
+                        tss.Eject(pawn);
+                    }
+                }
+            }
+
             if( bAutoEjectGenesFinishedRegrowing ){
                 foreach( Pawn pawn in geneExtractQueue ){
                     if( bOnlyIfGeneExtractor ){ 
@@ -56,6 +72,10 @@ public partial class Building_TSS {
                         tss.Eject(pawn);
                         geneExtractQueue.Remove(pawn);
                         return;
+                    }
+                    if( !tss.innerContainer.Contains(pawn) ){
+                        // cleanup
+                        geneExtractQueue.Remove(pawn);
                     }
                 }
             } else {
