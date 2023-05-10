@@ -15,7 +15,10 @@ static class Patch_IsSociallyProper {
     public static bool IsInPrisonDistrict(IntVec3 cell, Map map){
         if( cell.IsInPrisonCell(map) ) return true;
 
-        return cell.GetDistrict(map).Neighbors.Any((District d) => Cache.Get(d.Cells.First(), map) is Building_Cabin cabin && cabin.ForPrisoners );
+        District D = cell.GetDistrict(map);
+        if( D == null ) return false;
+
+        return D.Neighbors.Any((District d) => Cache.Get(d.Cells.First(), map) is Building_Cabin cabin && cabin.ForPrisoners );
     }
 
     public static bool NewIsSociallyProper(Thing t, Pawn p, bool forPrisoner, bool animalsCare = false) {
