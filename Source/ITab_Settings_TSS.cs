@@ -81,16 +81,16 @@ class ITab_Settings_TSS : ITab {
         }
         _Checkbox(l, "TSS.colonists", ref ai.bAutoCaptureColonists, disabled: tss.ForPrisoners);
 
-        l.GapLine();
+        l.Gap(10);
 
         _Checkbox(l, "TSS.tendable",   ref ai.bCaptureTendable);
         if( ModsConfig.BiotechActive ){
-            _Checkbox(l, "TSS.genesRegrowing", ref ai.bCaptureGenesRegrowing);
+            _Checkbox(l, "TSS.genesRegrowing", ref ai.bCaptureOnlyGenesRegrowing);
         }
 
         ///////////////////////// eject
 
-        l.Gap(20);
+        l.GapLine(40);
         l.Label("TSS.AutoEject".Translate());
 
         _Checkbox(l, "TSS.tendable",               ref ai.bAutoEjectTendable);

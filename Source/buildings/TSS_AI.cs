@@ -17,7 +17,7 @@ public partial class Building_TSS {
         public bool bAutoCaptureSlaves = false;
 
         public bool bCaptureTendable = false;
-        public bool bCaptureGenesRegrowing = true;
+        public bool bCaptureOnlyGenesRegrowing = false;
 
         public bool bAutoEjectTendable = true;
         public bool bOnlyIfEnoughMedBeds = true;
@@ -38,6 +38,7 @@ public partial class Building_TSS {
         private static readonly MethodInfo m_selectPawn = AccessTools.Method(typeof(Building_GeneExtractor), "SelectPawn");
         private static readonly FastInvokeHandler selectPawn = MethodInvoker.GetHandler(m_selectPawn);
 
+        // will eject only 1 pawn at each iteration
         private void autoEject(){
             if( bAutoEjectTendable ){
                 foreach( Thing t in tss.innerContainer ){
@@ -51,6 +52,7 @@ public partial class Building_TSS {
                             }
                         }
                         tss.Eject(pawn);
+                        return;
                     }
                 }
             }
@@ -76,6 +78,7 @@ public partial class Building_TSS {
                     if( !tss.innerContainer.Contains(pawn) ){
                         // cleanup
                         geneExtractQueue.Remove(pawn);
+                        return; // cannot iterate further
                     }
                 }
             } else {
@@ -83,15 +86,48 @@ public partial class Building_TSS {
             }
         }
 
-        private void autoCapture(){
+        // captures upto MaxSlots pawns each iteration
+        private void autoCapture(int n){
+            if( tss.ForPrisoners && !bAutoCapturePrisoners ) return;
+            if( !tss.ForPrisoners && !bAutoCaptureColonists && !bAutoCaptureSlaves ) return;
+
+            HashSet<Pawn> allSelectedPawns = new HashSet<Pawn>();
+            foreach (var b in tss.Map.listerBuildings.AllBuildingsColonistOfClass<Building_TSS>()) {
+                allSelectedPawns.AddRange( b.SelectedPawns );
+            }
+
+            foreach (Pawn pawn in tss.Map.mapPawns.AllPawnsSpawned) {
+                if( allSelectedPawns.Contains(pawn) ) continue;
+
+                AcceptanceReport acceptanceReport = tss.CanAcceptPawn(pawn);
+                if( !acceptanceReport.Accepted ) continue;
+
+                if( pawn.IsPrisonerOfColony && !bAutoCapturePrisoners ) continue;
+                if( pawn.IsColonistPlayerControlled ){
+                    if( pawn.IsSlave && !bAutoCaptureSlaves ) continue;
+                    if( !pawn.IsSlave && !bAutoCaptureColonists ) continue;
+                }
+                if( !pawn.CanReach(tss, PathEndMode.InteractionCell, Danger.Deadly, mode: TraverseMode.PassDoors) ) continue;
+
+                if( !bCaptureTendable && HealthAIUtility.ShouldEverReceiveMedicalCareFromPlayer(pawn) && pawn.health.HasHediffsNeedingTend() )
+                    continue;
+
+                if( bCaptureOnlyGenesRegrowing && !pawn.health.hediffSet.HasHediff(HediffDefOf.XenogermReplicating) )
+                    continue;
+
+                tss.SelectPawn(pawn);
+                n--;
+                if( n <= 0 ) break;
+            }
         }
 
         public void Work(){
             if( tss.nPawns > 0 ){
                 autoEject();
             }
-            if( tss.nPawns < tss.MaxSlots ){
-                autoCapture();
+            int nAvailSlots = tss.MaxSlots - (tss.nPawns + tss.SelectedPawns.Count);
+            if( nAvailSlots > 0 ){
+                autoCapture(nAvailSlots);
             }
         }
 
@@ -107,7 +143,7 @@ public partial class Building_TSS {
             Scribe_Values.Look(ref bAutoCaptureColonists, "bAutoCaptureColonists", false);
 
             Scribe_Values.Look(ref bCaptureTendable, "bCaptureTendable", false);
-            Scribe_Values.Look(ref bCaptureGenesRegrowing, "bCaptureGenesRegrowing", true);
+            Scribe_Values.Look(ref bCaptureOnlyGenesRegrowing, "bCaptureOnlyGenesRegrowing", false);
 
             Scribe_Values.Look(ref bAutoEjectTendable, "bAutoEjectTendable", true);
             Scribe_Values.Look(ref bOnlyIfEnoughMedBeds, "bOnlyIfEnoughMedBeds", true);

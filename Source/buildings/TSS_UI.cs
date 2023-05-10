@@ -171,7 +171,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         if( SelectedPawns.Any() ) {
             Command_Action c = new Command_Action();
             c.defaultLabel = "CommandCancelLoad".Translate();
-            c.defaultDesc = "CommandCancelLoadDesc".Translate();
             c.icon = CancelIcon;
             c.activateSound = SoundDefOf.Designate_Cancel;
             c.action = delegate
@@ -291,6 +290,13 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     public override string GetInspectString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.Append(base.GetInspectString());
+        if( SelectedPawns.Any() ){
+            List <string> names = new List<string>();
+            foreach( Pawn p in SelectedPawns ){
+                names.Add(p.NameShortColored.Resolve());
+            }
+            stringBuilder.AppendLineIfNotEmpty().Append( "WaitingFor".Translate().ToString() + ": " + names.ToCommaList() );
+        }
         if( nPawns > 0 ){
             List <string> names = new List<string>();
             foreach( Thing t in innerContainer ){

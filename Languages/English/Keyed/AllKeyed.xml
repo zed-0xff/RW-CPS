@@ -17,7 +17,6 @@
   <TSS.slaves>slaves</TSS.slaves>
   <TSS.colonists>colonists</TSS.colonists>
 
-  <TSS.skipTendable>skip tendable patients</TSS.skipTendable>
   <TSS.tendable>tendable patients</TSS.tendable>
   <TSS.genesRegrowing>only with "genes regrowing" hediff</TSS.genesRegrowing>
 

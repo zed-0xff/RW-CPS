@@ -289,7 +289,14 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         bool num = pawn.DeSpawnOrDeselect();
         if (innerContainer.TryAddOrTransfer(pawn)) {
             SoundDefOf.CryptosleepCasket_Accept.PlayOneShot(SoundInfo.InMap(this));
-            SelectedPawns.Remove(pawn); // or don't remove?
+            SelectedPawns.Remove(pawn);
+            if( pawn.IsPrisonerOfColony ){
+                if( CPSMod.Settings.tss.unassignPrisonerBeds ) pawn.ownership.UnclaimBed();
+            } else if( pawn.IsSlaveOfColony ) {
+                if( CPSMod.Settings.tss.unassignSlaveBeds ) pawn.ownership.UnclaimBed();
+            } else {
+                if( CPSMod.Settings.tss.unassignColonistBeds ) pawn.ownership.UnclaimBed();
+            }
         }
         if (num) {
             Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);

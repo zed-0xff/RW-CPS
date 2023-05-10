@@ -16,10 +16,18 @@ public class CPSSettings : ModSettings
         public bool effects = true;
         public bool menus = true;
 
+        public bool unassignColonistBeds = false;
+        public bool unassignSlaveBeds = false;
+        public bool unassignPrisonerBeds = true;
+
         public void ExposeData() {
             Scribe_Values.Look(ref sounds, "sounds", true);
             Scribe_Values.Look(ref effects, "effects", true);
             Scribe_Values.Look(ref menus, "menus", true);
+
+            Scribe_Values.Look(ref unassignColonistBeds, "unassignColonistBeds", false);
+            Scribe_Values.Look(ref unassignSlaveBeds,    "unassignSlaveBeds",    false);
+            Scribe_Values.Look(ref unassignPrisonerBeds, "unassignPrisonerBeds", true);
         }
     };
 
@@ -176,6 +184,12 @@ public class CPSMod : Mod
         l.CheckboxLabeled("Sounds", ref Settings.tss.sounds);
         l.CheckboxLabeled("Effects", ref Settings.tss.effects);
         l.CheckboxLabeled("Context menus", ref Settings.tss.menus);
+        l.Gap();
+
+        l.Label("Unassign beds on entering TSS");
+            l.CheckboxLabeled("Prisoners", ref Settings.tss.unassignPrisonerBeds, 20);
+            l.CheckboxLabeled("Slaves", ref Settings.tss.unassignSlaveBeds, 20);
+            l.CheckboxLabeled("Colonists", ref Settings.tss.unassignColonistBeds, 20);
 
         l.End();
     }
