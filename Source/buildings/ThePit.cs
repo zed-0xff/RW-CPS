@@ -8,6 +8,8 @@ using UnityEngine;
 
 namespace zed_0xff.CPS;
 
+// fixes 'Tried to get a resource "UI/Commands/ForPrisoners" from a different thread. All resources must be loaded in the main thread.'
+[StaticConstructorOnStartup]
 public class Building_ThePit : Building_Base
 {
     public override int MaxSlots => 5;
@@ -19,12 +21,18 @@ public class Building_ThePit : Building_Base
         base.SpawnSetup(map, respawningAfterLoad);
     }
 
+    protected static readonly Texture2D pIcon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
+    protected static readonly string pLabel = "CommandBedSetForPrisonersLabel".Translate();
+
     // disable 'set for prisoners' gizmo
     public override IEnumerable<Gizmo> GetGizmos()
     {
         foreach (Gizmo gizmo in base.GetGizmos()){
             if( gizmo is Command_Toggle ct && (ct.defaultLabel == pLabel || ct.icon == pIcon) ){
                 ct.Disable();
+            } else if ( gizmo is Command_SetBedOwnerType ){
+                // ideology is active
+                gizmo.Disable();
             }
             yield return gizmo;
         }

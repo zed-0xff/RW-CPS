@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace zed_0xff.CPS;
 
-// fixes 'Tried to get a resource "UI/Commands/ForPrisoners" from a different thread. All resources must be loaded in the main thread.'
-[StaticConstructorOnStartup]
 public abstract class Building_Base : Building_Bed {
     public bool IsDespawning = false;
 
@@ -24,9 +22,6 @@ public abstract class Building_Base : Building_Bed {
         }
         return false;
     }
-
-    protected static readonly Texture2D pIcon = ContentFinder<Texture2D>.Get("UI/Commands/ForPrisoners");
-    protected static readonly string pLabel = "CommandBedSetForPrisonersLabel".Translate();
 
     protected CompAssignableToPawn compAssignableToPawn = null;
     protected CompPowerTrader      compPowerTrader = null;
