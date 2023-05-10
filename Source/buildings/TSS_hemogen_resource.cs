@@ -65,6 +65,10 @@ public partial class Building_TSS : IResourceStore {
         }
     }
 
+    public int CountAllHemogen(){
+        return (int)Value + (hemogenNetAdapter != null ? (int)hemogenNetAdapter.Stored : 0);
+    }
+
     public void SetTargetValuePct(float val){
         RefuelableComp.TargetFuelLevel = val * Max;
         // push extra blood to the hemogen network

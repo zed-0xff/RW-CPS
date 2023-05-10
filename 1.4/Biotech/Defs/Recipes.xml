@@ -5,6 +5,7 @@
 
   <RecipeDef Name="CPS_ExtractHemogenPack" ParentName="ExtractHemogenPack" Abstract="True">
     <workerClass>zed_0xff.CPS.Recipe_ExtractHemogen_TSS</workerClass>
+    <workerCounterClass>zed_0xff.CPS.RecipeWorkerCounter_Hemogen</workerCounterClass>
     <products>
       <HemogenPack>1</HemogenPack>
     </products>
