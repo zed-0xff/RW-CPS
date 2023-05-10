@@ -12,6 +12,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
+    <canBeDoneByMechs MayRequire="DanceNinja.LifterPlzDoMoreJobs">true</canBeDoneByMechs>
   </WorkGiverDef>
 
   <WorkGiverDef>
@@ -25,7 +26,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
-    <canBeDoneByMechs>false</canBeDoneByMechs>
+    <canBeDoneByMechs MayRequire="DanceNinja.LifterPlzDoMoreJobs">true</canBeDoneByMechs>
   </WorkGiverDef>
 
 </Defs>
