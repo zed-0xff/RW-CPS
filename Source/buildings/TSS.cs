@@ -421,21 +421,21 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             if (this.IsHashIntervalTick(2500)) {
                 rotate();
             }
-            Thing thingToDrop = null;
+            Thing thingToEject = null;
             foreach( Thing t in innerContainer ){
                 if( t is Pawn pawn ){
                     if( pawn.Dead ){
-                        thingToDrop = t;
+                        thingToEject = t;
                     } else {
                         pawn.health.AddHediff(HediffDefOf.CryptosleepSickness);
                         pawn.needs?.mood?.thoughts?.memories?.RemoveMemoriesOfDef(ThoughtDefOf.SleptOutside);
                     }
                 } else if( t is Corpse ){
-                    thingToDrop = t;
+                    thingToEject = t;
                 }
             }
-            if( thingToDrop != null ){
-                innerContainer.TryDrop(thingToDrop, InteractionCell, Map, ThingPlaceMode.Near, out _);
+            if( thingToEject != null ){
+                Eject(thingToEject);
             }
 
             if( dbh != null ){
