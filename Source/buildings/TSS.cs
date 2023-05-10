@@ -133,6 +133,10 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     {
         base.SpawnSetup(map, respawningAfterLoad);
 
+        if( ai == null ){
+            ai = new AI();
+        }
+
         // from Building_Bed
         Region validRegionAt_NoRebuild = map.regionGrid.GetValidRegionAt_NoRebuild(base.Position);
         if (validRegionAt_NoRebuild != null && validRegionAt_NoRebuild.Room.IsPrisonCell) {
@@ -500,8 +504,9 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         Scribe_Deep.Look(ref billStack, "bills", this);
         Scribe_Deep.Look(ref currentBillReport, "currentBillReport");
 
-        if (allowedNutritionSettings == null)
-        {
+        Scribe_Deep.Look(ref ai, "ai");
+
+        if (allowedNutritionSettings == null) {
             allowedNutritionSettings = new StorageSettings(this);
             if (def.building.defaultStorageSettings != null)
             {
