@@ -6,6 +6,8 @@
   <NeverDeliverHemogen>Never deliver hemogen.</NeverDeliverHemogen>
   <CaptureToTSS>Capture {1_labelShort} to TSS</CaptureToTSS>
   <ArrestToTSS>Try to arrest {1_labelShort} and put them into TSS</ArrestToTSS>
+
+  <CPS.AI>AI</CPS.AI>
   <CPS.Settings>Settings</CPS.Settings>
 
   <TSS.AutoCapture>Auto capture</TSS.AutoCapture>

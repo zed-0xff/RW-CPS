@@ -15,7 +15,7 @@ class ITab_Settings_TSS : ITab {
     private Building_TSS tss { get => this.SelThing as Building_TSS; }
 
     public ITab_Settings_TSS() {
-        this.labelKey = "CPS.Settings";
+        this.labelKey = "CPS.AI";
     }
 
     protected override void UpdateSize() {

@@ -308,8 +308,8 @@ Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
 
     <containedPawnsSelectable>false</containedPawnsSelectable>
     <inspectorTabs>
-      <li>zed_0xff.CPS.ITab_Settings_TSS</li>
       <li>zed_0xff.CPS.ITab_Contents_TSS</li>
+      <li>zed_0xff.CPS.ITab_Settings_TSS</li>
       <li>ITab_Storage</li>
       <li MayRequire="Ludeon.RimWorld.Biotech">zed_0xff.CPS.ITab_Bills_TSS</li>
     </inspectorTabs>

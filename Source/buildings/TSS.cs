@@ -134,7 +134,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         base.SpawnSetup(map, respawningAfterLoad);
 
         if( ai == null ){
-            ai = new AI();
+            ai = new AI(this);
         }
 
         // from Building_Bed
@@ -422,9 +422,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             lastTickWithPower = Find.TickManager.TicksGame;
             feedOccupants();
 
-            if (this.IsHashIntervalTick(2500)) {
-                rotate();
-            }
             Thing thingToEject = null;
             foreach( Thing t in innerContainer ){
                 if( t is Pawn pawn ){
@@ -440,6 +437,11 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             }
             if( thingToEject != null ){
                 Eject(thingToEject);
+            }
+
+            if (this.IsHashIntervalTick(2500)) {
+                ai.Work();
+                rotate();
             }
 
             if( dbh != null ){
@@ -504,7 +506,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         Scribe_Deep.Look(ref billStack, "bills", this);
         Scribe_Deep.Look(ref currentBillReport, "currentBillReport");
 
-        Scribe_Deep.Look(ref ai, "ai");
+        Scribe_Deep.Look(ref ai, "ai", this);
 
         if (allowedNutritionSettings == null) {
             allowedNutritionSettings = new StorageSettings(this);
