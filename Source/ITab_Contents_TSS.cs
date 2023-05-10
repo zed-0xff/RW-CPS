@@ -13,10 +13,8 @@ public class ITab_Contents_TSS : ITab_ContentsBase
 
     public override bool UseDiscardMessage => false;
 
-    public override IList<Thing> container
-    {
-        get
-        {
+    public override IList<Thing> container {
+        get {
             Building_TSS b = base.SelThing as Building_TSS;
             listInt.Clear();
             if (b != null && b.innerContainer != null)
@@ -27,10 +25,14 @@ public class ITab_Contents_TSS : ITab_ContentsBase
         }
     }
 
-    public ITab_Contents_TSS()
-    {
+    public ITab_Contents_TSS() {
         labelKey = "Contents";
         containedItemsKey = "Contents";
         canRemoveThings = true;
+    }
+
+    protected override void OnDropThing(Thing t, int count) {
+        Building_TSS b = base.SelThing as Building_TSS;
+        b.Eject(t);
     }
 }

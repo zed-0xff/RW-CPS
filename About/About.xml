@@ -31,6 +31,7 @@ TSS:
   </modDependencies>
   <loadAfter>
     <li>Ludeon.RimWorld</li>
+    <li>ludeon.rimworld.biotech</li>
     <li>brrainz.harmony</li>
     <li>OskarPotocki.VanillaFactionsExpanded.Core</li>
     <li>VanillaExpanded.VNutrientE</li>

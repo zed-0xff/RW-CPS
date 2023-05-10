@@ -277,20 +277,29 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         return true;
     }
 
-    public override void TryAcceptPawn(Pawn pawn)
-    {
+    public override void TryAcceptPawn(Pawn pawn) {
         if ( !CanAcceptPawn(pawn) ) {
             return;
         }
         selectedPawn = null;
         bool num = pawn.DeSpawnOrDeselect();
         if (innerContainer.TryAddOrTransfer(pawn)) {
-            SoundDefOf.GrowthVat_Close.PlayOneShot(SoundInfo.InMap(this));
+            SoundDefOf.CryptosleepCasket_Accept.PlayOneShot(SoundInfo.InMap(this));
             SelectedPawns.Remove(pawn); // or don't remove?
         }
         if (num) {
             Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);
         }
+    }
+
+    public void Eject(Thing t){
+        if( t is Pawn || t is Corpse ){
+            SoundDefOf.CryptosleepCasket_Eject.PlayOneShot(SoundInfo.InMap(this));
+            if( topPawns != null ){
+                topPawns.Remove(t as Pawn);
+            }
+        }
+        innerContainer.TryDrop(t, InteractionCell, Map, ThingPlaceMode.Near, out _);
     }
 
     // </Building_Enterable>
@@ -342,7 +351,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             if ( nPawns > 0 ){
                 if( CPSMod.Settings.tss.sounds ){
                     if (sustainerWorking == null || sustainerWorking.Ended) {
-                        sustainerWorking = SoundDefOf.GeneExtractor_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
+                        sustainerWorking = SoundDefOf.GrowthVat_Working.TrySpawnSustainer(SoundInfo.InMap(this, MaintenanceType.PerTick));
                     } else {
                         sustainerWorking.Maintain();
                     }
@@ -412,12 +421,23 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             if (this.IsHashIntervalTick(2500)) {
                 rotate();
             }
+            Thing thingToDrop = null;
             foreach( Thing t in innerContainer ){
-                if( t is Pawn pawn && !pawn.Dead ){
-                    pawn.health.AddHediff(HediffDefOf.CryptosleepSickness);
-                    pawn.needs?.mood?.thoughts?.memories?.RemoveMemoriesOfDef(ThoughtDefOf.SleptOutside);
+                if( t is Pawn pawn ){
+                    if( pawn.Dead ){
+                        thingToDrop = t;
+                    } else {
+                        pawn.health.AddHediff(HediffDefOf.CryptosleepSickness);
+                        pawn.needs?.mood?.thoughts?.memories?.RemoveMemoriesOfDef(ThoughtDefOf.SleptOutside);
+                    }
+                } else if( t is Corpse ){
+                    thingToDrop = t;
                 }
             }
+            if( thingToDrop != null ){
+                innerContainer.TryDrop(thingToDrop, InteractionCell, Map, ThingPlaceMode.Near, out _);
+            }
+
             if( dbh != null ){
                 foreach( Thing t in innerContainer ){
                     if( t is Pawn pawn ){
@@ -458,11 +478,10 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     }
 
     void EjectAll(){
-        Thing lastResultingThing;
         List<Thing> things = new List<Thing>( innerContainer ); // original list will be modified in process
         foreach( Thing t in things ){
             if( t is Pawn ){
-                innerContainer.TryDrop(t, InteractionCell, Map, ThingPlaceMode.Near, out lastResultingThing);
+                Eject(t);
             }
         }
         topPawns = null;
