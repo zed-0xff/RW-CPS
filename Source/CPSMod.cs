@@ -85,7 +85,7 @@ public class CPSMod : Mod
     }
 
     private static Vector2 scrollPosition = Vector2.zero;
-    private int PageIndex = 0;
+    private int PageIndex = 1;
 
     public override void DoSettingsWindowContents(Rect inRect)
     {
@@ -100,7 +100,7 @@ public class CPSMod : Mod
         Widgets.DrawMenuSection(mainRect);
 
         var tabs = new List<TabRecord> {
-            new TabRecord("General".Translate(), () => { PageIndex = 0; WriteSettings(); }, PageIndex == 0),
+//            new TabRecord("General".Translate(), () => { PageIndex = 0; WriteSettings(); }, PageIndex == 0),
             new TabRecord("TSS".Translate(),     () => { PageIndex = 1; WriteSettings(); }, PageIndex == 1),
         };
 
