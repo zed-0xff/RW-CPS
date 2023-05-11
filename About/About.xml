@@ -1,29 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>CPS</name>
+  <name>CPS: Compact Pawn Storage</name>
   <author>zed_0xff</author>
   <packageId>zed.0xff.CPS</packageId>
   <url>https://github.com/zed-0xff/RW-CPS</url>
   <supportedVersions>
     <li>1.4</li>
   </supportedVersions>
-  <description>CPS
+  <description><![CDATA[
+<color=#1a8bffff><b>The Pit:</b></color>
+  • Very easy to build. Very dirty. Very uncomfortable.
+  • Very high chance of infections and tantrums.
+  • Can be built outside.
+  • Fits 5 prisoners in 2x2 space
 
-Cabin:
-  + soundproof
+<color=#1a8bffff><b>Cabin:</b></color>
+  • Soundproof
+  • Has climate controls
+  • Has some comfort
+  • Movable
+  • Pawns can eat inside
+  • Can be assigned to prisoners, but needs extra outside walls or high fences to contain them.
+  • Fits 10 pawns in 4x2 space
 
-TSS:
-  + has built-in nutrient paste producer for feeding occupants
-  + optionally connects to VNPE network (as a consumer)
-  + optionally connects to VRES hemogen network (as a consumer and producer)
-  + optionally connects to DBH for water and bladder needs
-  + maintains comfortable inside temperature
+<color=#1a8bffff><b>TSS (Test Subject Storage):</b></color>
+  • Built-in nutrient paste producer
+  • Optionally connects to VNPE network
+  • Optionally connects to VRE-S hemogen network
+  • Optionally connects to DBH for water and bladder needs
+  • Maintains comfortable inside temperature
+  • Fits 16 pawns in 4x2 space
 
-Mods:
-[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2884057958]Lifter Plz Do More Jobs[/url]
-
-[url=https://ko-fi.com/K3K81Z3W5][img]https://i.imgur.com/Utx6OIH.png[/img][/url] [url=https://github.com/zed-0xff/RW-CPS]github[/url]
-</description>
+<b>Links:</b>
+  • https://ko-fi.com/K3K81Z3W5
+  • https://github.com/zed-0xff/RW-CPS
+]]></description>
   <modDependencies>
       <li>
           <packageId>brrainz.harmony</packageId>
