@@ -17,7 +17,7 @@ public class CPSSettings : ModSettings
         public bool menus = true;
 
         public bool unassignColonistBeds = false;
-        public bool unassignSlaveBeds = false;
+        public bool unassignSlaveBeds = true;
         public bool unassignPrisonerBeds = true;
 
         public Building_TSS.AI.Config default_ai_config;
@@ -28,7 +28,7 @@ public class CPSSettings : ModSettings
             Scribe_Values.Look(ref menus, "menus", true);
 
             Scribe_Values.Look(ref unassignColonistBeds, "unassignColonistBeds", false);
-            Scribe_Values.Look(ref unassignSlaveBeds,    "unassignSlaveBeds",    false);
+            Scribe_Values.Look(ref unassignSlaveBeds,    "unassignSlaveBeds",    true);
             Scribe_Values.Look(ref unassignPrisonerBeds, "unassignPrisonerBeds", true);
 
             Scribe_Deep.Look(ref default_ai_config, "default_ai_config");
