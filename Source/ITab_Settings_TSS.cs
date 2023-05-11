@@ -10,7 +10,7 @@ namespace zed_0xff.CPS;
 
 class ITab_Settings_TSS : ITab {
 
-    private Vector2 winSize = new Vector2(400f, 0f);
+    private Vector2 winSize = new Vector2(400, 0);
 
     private Building_TSS tss { get => this.SelThing as Building_TSS; }
 
@@ -19,8 +19,8 @@ class ITab_Settings_TSS : ITab {
     }
 
     protected override void UpdateSize() {
-        winSize.y = 400f;
-        winSize.x = 400f;
+        winSize.y = 450;
+        winSize.x = 400;
 
         this.size = winSize;
         base.UpdateSize();
@@ -62,9 +62,10 @@ class ITab_Settings_TSS : ITab {
         Listing_Standard l = new Listing_Standard();
         Rect inRect = new Rect(0f, 0f, winSize.x, winSize.y).ContractedBy(10f);
 
-        var ai = tss.ai;
-        if( ai == null ){
-            // should not happen
+        var cfg = tss?.ai?.cfg;
+        if( cfg == null ){
+            // should not be here
+            Log.Error("[?] CPS: null AI cfg");
             return;
         }
 
@@ -75,17 +76,17 @@ class ITab_Settings_TSS : ITab {
         l.Gap(12);
         l.Label("TSS.AutoCapture".Translate());
 
-        _Checkbox(l, "TSS.prisoners", ref ai.bAutoCapturePrisoners, disabled: !tss.ForPrisoners);
+        _Checkbox(l, "TSS.prisoners", ref cfg.bAutoCapturePrisoners, disabled: !tss.ForPrisoners);
         if( ModsConfig.IdeologyActive ){
-            _Checkbox(l, "TSS.slaves", ref ai.bAutoCaptureSlaves, disabled: tss.ForPrisoners);
+            _Checkbox(l, "TSS.slaves", ref cfg.bAutoCaptureSlaves, disabled: tss.ForPrisoners);
         }
-        _Checkbox(l, "TSS.colonists", ref ai.bAutoCaptureColonists, disabled: tss.ForPrisoners);
+        _Checkbox(l, "TSS.colonists", ref cfg.bAutoCaptureColonists, disabled: tss.ForPrisoners);
 
         l.Gap(10);
 
-        _Checkbox(l, "TSS.tendable",   ref ai.bCaptureTendable);
+        _Checkbox(l, "TSS.tendable",   ref cfg.bCaptureTendable);
         if( ModsConfig.BiotechActive ){
-            _Checkbox(l, "TSS.genesRegrowing", ref ai.bCaptureOnlyGenesRegrowing);
+            _Checkbox(l, "TSS.genesRegrowing", ref cfg.bCaptureOnlyGenesRegrowing);
         }
 
         ///////////////////////// eject
@@ -93,16 +94,21 @@ class ITab_Settings_TSS : ITab {
         l.GapLine(40);
         l.Label("TSS.AutoEject".Translate());
 
-        _Checkbox(l, "TSS.tendable",               ref ai.bAutoEjectTendable);
-        __Checkbox(l, "TSS.onlyIfEnoughBeds",      ref ai.bOnlyIfEnoughMedBeds);
+        _Checkbox(l, "TSS.tendable",               ref cfg.bAutoEjectTendable);
+        __Checkbox(l, "TSS.onlyIfEnoughBeds",      ref cfg.bOnlyIfEnoughMedBeds);
 
         if( ModsConfig.BiotechActive ){
-            _Checkbox(l, "TSS.genesFinishedRegrowing", ref ai.bAutoEjectGenesFinishedRegrowing);
-            __Checkbox(l, "TSS.onlyIfGeneExtractor",   ref ai.bOnlyIfGeneExtractor);
-            ___Checkbox(l, "TSS.autoExtract",          ref ai.bAutoExtract);
+            _Checkbox(l, "TSS.genesFinishedRegrowing", ref cfg.bAutoEjectGenesFinishedRegrowing);
+            __Checkbox(l, "TSS.onlyIfGeneExtractor",   ref cfg.bOnlyIfGeneExtractor);
+            ___Checkbox(l, "TSS.autoExtract",          ref cfg.bAutoExtract);
         }
 
-        l.Gap();
+        l.Gap(20);
+        if( l.ButtonText("CPS.SaveDefault".Translate(), widthPct: 0.3f) ){
+            CPSMod.Settings.tss.default_ai_config = cfg.Clone();
+            CPSMod.Settings.Write();
+        }
+
         l.End();
     }
 }
