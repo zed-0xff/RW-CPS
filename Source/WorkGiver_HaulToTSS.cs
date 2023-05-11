@@ -27,13 +27,13 @@ public class WorkGiver_HaulToTSS : WorkGiver_Scanner
         {
             return false;
         }
-        if (!(t is Building_TSS b))
+        if (!(t is Building_TSS tss))
         {
             return false;
         }
-        if (b.NutritionNeeded > NutritionBuffer)
+        if (tss.NutritionNeeded > NutritionBuffer)
         {
-            if (FindNutrition(pawn, b).Thing == null)
+            if (FindNutrition(pawn, tss).Thing == null)
             {
                 JobFailReason.Is("NoFood".Translate());
                 return false;
@@ -45,13 +45,13 @@ public class WorkGiver_HaulToTSS : WorkGiver_Scanner
 
     public override Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
     {
-        if (!(t is Building_TSS b))
+        if (!(t is Building_TSS tss))
         {
             return null;
         }
-        if (b.NutritionNeeded > 0f)
+        if (tss.NutritionNeeded > 0f)
         {
-            ThingCount thingCount = FindNutrition(pawn, b);
+            ThingCount thingCount = FindNutrition(pawn, tss);
             if (thingCount.Thing != null)
             {
                 Job job = HaulAIUtility.HaulToContainerJob(pawn, thingCount.Thing, t);
@@ -75,14 +75,14 @@ public class WorkGiver_HaulToTSS : WorkGiver_Scanner
         return true;
     }
 
-    private ThingCount FindNutrition(Pawn pawn, Building_TSS b)
+    private ThingCount FindNutrition(Pawn pawn, Building_TSS tss)
     {
         Thing thing = GenClosest.ClosestThingReachable(pawn.Position, pawn.Map, ThingRequest.ForGroup(ThingRequestGroup.FoodSourceNotPlantOrTree), PathEndMode.ClosestTouch, TraverseParms.For(pawn), 9999f, Validator);
         if (thing == null)
         {
             return default(ThingCount);
         }
-        int n = Mathf.CeilToInt(b.NutritionNeeded / thing.GetStatValue(StatDefOf.Nutrition));
+        int n = Mathf.CeilToInt(tss.NutritionNeeded / thing.GetStatValue(StatDefOf.Nutrition));
         return new ThingCount(thing, Mathf.Min(thing.stackCount, n));
 
         bool Validator(Thing x)
@@ -91,11 +91,11 @@ public class WorkGiver_HaulToTSS : WorkGiver_Scanner
             {
                 return false;
             }
-            if (!b.CanAcceptNutrition(x))
+            if (!tss.CanAcceptNutrition(x))
             {
                 return false;
             }
-            if (x.def.GetStatValueAbstract(StatDefOf.Nutrition) > b.NutritionNeeded)
+            if (x.def.GetStatValueAbstract(StatDefOf.Nutrition) > tss.NutritionNeeded)
             {
                 return false;
             }

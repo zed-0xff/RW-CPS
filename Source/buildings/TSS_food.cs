@@ -21,6 +21,19 @@ public partial class Building_TSS {
             this.parent = parent;
         }
 
+        public float NutritionStored {
+            get {
+                float num = 0;
+                for (int i = 0; i < parent.innerContainer.Count; i++) {
+                    Thing thing = parent.innerContainer[i];
+                    if( !(thing is Pawn) && !(thing is Corpse) ){
+                        num += (float)thing.stackCount * thing.GetStatValue(StatDefOf.Nutrition);
+                    }
+                }
+                return num;
+            }
+        }
+
         public virtual bool CanMakePasteFrom(Thing t){
             return t != null
                 && !(t is Pawn)
@@ -73,14 +86,25 @@ public partial class Building_TSS {
 
     List<IDispenser> dispensers = new List<IDispenser>();
 
-    Thing TryDispenseFood(){
+    Thing TryDispenseAnyFood(){
         Thing meal = null;
         foreach( IDispenser dispenser in dispensers ){
             meal = dispenser.TryDispenseFood();
-            if( meal != null )
+            if( meal != null ){
                 break;
+            }
         }
         return meal;
+    }
+
+    bool CanDispenseAnyFood(){
+        return dispensers.Any(d => d.CanDispenseNow);
+    }
+
+    public float TotalNutritionAvailable {
+        get {
+            return dispensers.Sum(d => d.NutritionStored);
+        }
     }
 
     void feedOccupants(){
@@ -93,7 +117,7 @@ public partial class Building_TSS {
             if (pawn.needs.food.CurLevelPercentage > 0.4)
                 continue;
 
-            Thing meal = TryDispenseFood();
+            Thing meal = TryDispenseAnyFood();
             if( meal == null )
                 break;
 

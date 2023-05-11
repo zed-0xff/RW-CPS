@@ -16,14 +16,19 @@ public class Dispenser_VNPE : IDispenser {
         }
     }
 
+    public bool CanDispenseNow => pasteComp != null && pasteComp.PipeNet.Stored >= 1;
+
+    public float NutritionStored {
+        get {
+            return pasteComp == null ? 0 : pasteComp.PipeNet.Stored * ThingDefOf.MealNutrientPaste.GetStatValueAbstract(StatDefOf.Nutrition);
+        }
+    }
+
     public Thing TryDispenseFood(){
-        if( pasteComp == null )
+        if( !CanDispenseNow )
             return null;
 
         var net = pasteComp.PipeNet;
-        if( net.Stored < 1 )
-            return null;
-
         net.DrawAmongStorage(1, net.storages);
         Thing meal = ThingMaker.MakeThing(ThingDefOf.MealNutrientPaste);
         if (meal.TryGetComp<CompIngredients>() is CompIngredients ingredients)

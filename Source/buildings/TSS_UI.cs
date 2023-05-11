@@ -271,22 +271,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         }
     }
 
-    public float NutritionStored
-    {
-        get
-        {
-            float num = 0;
-            for (int i = 0; i < innerContainer.Count; i++)
-            {
-                Thing thing = innerContainer[i];
-                if( !(thing is Pawn) ){
-                    num += (float)thing.stackCount * thing.GetStatValue(StatDefOf.Nutrition);
-                }
-            }
-            return num;
-        }
-    }
-
     public override string GetInspectString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.Append(base.GetInspectString());
@@ -307,11 +291,11 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             stringBuilder.AppendLineIfNotEmpty().Append( "CasketContains".Translate().ToString() + ": " + names.ToCommaList() );
 
             stringBuilder.AppendLineIfNotEmpty().Append("Nutrition".Translate()).Append(": ")
-                .Append(NutritionStored.ToStringByStyle(ToStringStyle.FloatMaxOne));
+                .Append(TotalNutritionAvailable.ToStringByStyle(ToStringStyle.FloatMaxOne));
             stringBuilder.Append(" (-").Append("PerDay".Translate(NutritionConsumedPerDay.ToString("F1"))).Append(")");
         } else {
             stringBuilder.AppendLineIfNotEmpty().Append("Nutrition".Translate()).Append(": ")
-                .Append(NutritionStored.ToStringByStyle(ToStringStyle.FloatMaxOne));
+                .Append(TotalNutritionAvailable.ToStringByStyle(ToStringStyle.FloatMaxOne));
         }
         if( PowerOn && currentBillReport != null ){
             stringBuilder.AppendLineIfNotEmpty().Append("TSS_BillReport".Translate(currentBillReport.bill.Label.ToString(), currentBillReport.workLeft.ToStringWorkAmount()));

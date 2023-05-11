@@ -131,16 +131,18 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
     public override void SpawnSetup(Map map, bool respawningAfterLoad)
     {
+        if( !respawningAfterLoad ){
+            // from Building_Bed, works good before base.SpawnSetup()
+            Region region = map.regionGrid.GetValidRegionAt_NoRebuild(InteractionCell);
+            if( region != null && region.Room != null && region.Room.IsPrisonCell ){
+                ForPrisoners = true;
+            }
+        }
+
         base.SpawnSetup(map, respawningAfterLoad);
 
         if( ai == null ){
             ai = new AI(this);
-        }
-
-        // from Building_Bed
-        Region validRegionAt_NoRebuild = map.regionGrid.GetValidRegionAt_NoRebuild(base.Position);
-        if (validRegionAt_NoRebuild != null && validRegionAt_NoRebuild.Room.IsPrisonCell) {
-            ForPrisoners = true;
         }
 
         restEffectiveness = 
@@ -190,21 +192,20 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_BloodTransfusion_Colonists_100")] = PatientType.Recipient_Colonist_100;
             recipeMap[DefDatabase<RecipeDef>.GetNamed("CPS_BloodTransfusion_All_50")]        = PatientType.Recipient_All_50;
         }
+
+        rotate();
     }
 
     private IPlugin dbh = null;
 
-    public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
-    {
+    public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish) {
         sustainerWorking = null;
         base.DeSpawn(mode);
     }
 
-    public float NutritionNeeded
-    {
-        get
-        {
-            return NutritionBuffer - NutritionStored;
+    public float NutritionNeeded {
+        get {
+            return NutritionBuffer - TotalNutritionAvailable;
         }
     }
 
@@ -222,23 +223,19 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     private StorageSettings allowedNutritionSettings;
     public bool StorageTabVisible => true;
 
-    public bool CanAcceptNutrition(Thing thing)
-    {
+    public bool CanAcceptNutrition(Thing thing) {
         return allowedNutritionSettings.AllowedToAccept(thing);
     }
 
-    public StorageSettings GetStoreSettings()
-    {
+    public StorageSettings GetStoreSettings() {
         return allowedNutritionSettings;
     }
 
-    public StorageSettings GetParentStoreSettings()
-    {
+    public StorageSettings GetParentStoreSettings() {
         return def.building.fixedStorageSettings;
     }
 
-    public void Notify_SettingsChanged()
-    {
+    public void Notify_SettingsChanged() {
     }
 
     // </IStoreSettingsParent>
@@ -297,6 +294,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             } else {
                 if( CPSMod.Settings.tss.unassignColonistBeds ) pawn.ownership.UnclaimBed();
             }
+            rotate();
         }
         if (num) {
             Find.Selector.Select(pawn, playSound: false, forceDesignatorDeselect: false);
@@ -309,6 +307,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             if( topPawns != null ){
                 topPawns.Remove(t as Pawn);
             }
+            rotate();
         }
         innerContainer.TryDrop(t, InteractionCell, Map, ThingPlaceMode.Near, out _);
     }
@@ -330,19 +329,21 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
            topPawns.Clear();
        }
 
-       Thing[] allPawns = innerContainer.Where((Thing t) => t is Pawn).ToArray();
-       if( allPawns.Length <= 4 ){
+       Thing[] allPawns = innerContainer.Where((Thing t) => t is Pawn pawn && !pawn.Dead).ToArray();
+       nPawns = allPawns.Length;
+
+       if( nPawns <= 4 ){
            foreach( Thing t in allPawns ){
                topPawns.Add(t as Pawn);
            }
        } else {
            curOffset++;
-           if( curOffset >= allPawns.Length )
+           if( curOffset >= nPawns )
                curOffset = 0;
 
            int i = curOffset;
            while( topPawns.Count < 4 ){
-               if( i >= allPawns.Length )
+               if( i >= nPawns )
                    i = 0;
                topPawns.Add(allPawns[i] as Pawn);
                i++;
@@ -369,32 +370,11 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 }
             }
 
-            // check for ejected pawns, tick resting
-            int np = 0;
+            // tick resting
             foreach( Thing t in innerContainer ) {
                 if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
-                    np++;
                     pawn.needs.rest.TickResting(restEffectiveness);
                 }
-            }
-            if( np != nPawns ){
-                // someone was ejected
-                topPawns = null;
-                nPawns = np;
-            }
-        } else {
-            // check for ejected pawns, tick resting
-            int np = 0;
-            foreach( Thing t in innerContainer ) {
-                if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
-                    np++;
-                    // no rest
-                }
-            }
-            if( np != nPawns ){
-                // someone was ejected
-                topPawns = null;
-                nPawns = np;
             }
         }
 
@@ -403,7 +383,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
         Tick_Bills();
 
-        if (this.IsHashIntervalTick(250) || topPawns == null) {
+        if( this.IsHashIntervalTick(250) ){
             TickRare();
         }
     }
@@ -413,15 +393,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     // 3. rotate pawns
     // 4. feed pawns
     // 5. check DBH needs
-    public override void TickRare()
-    {
-        nPawns = 0;
-        foreach( Thing t in innerContainer ){
-            if( t is Pawn pawn ){
-                nPawns++;
-            }
-        }
-
+    public override void TickRare() {
         if( topPawns == null )
             rotate();
 
@@ -446,7 +418,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 Eject(thingToEject);
             }
 
-            if (this.IsHashIntervalTick(2500)) {
+            if (this.IsHashIntervalTick(1200)) {
                 ai.Work();
                 rotate();
             }
