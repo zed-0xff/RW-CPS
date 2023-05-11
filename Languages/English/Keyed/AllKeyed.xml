@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <TSS_BillReport>Current bill: {0} ({1} work left)</TSS_BillReport>
+  <TSS_BillReport>{0} ({1} work left)</TSS_BillReport>
   <AutoDeliverHemogenDesc>This determines whether pawns will automatically deliver hemogen packs when stored hemogen is below {MIN}.\n\nAutomatic delivery is currently {ONOFF}.</AutoDeliverHemogenDesc>
   <DeliverHemogenBelow>Deliver hemogen below</DeliverHemogenBelow>
   <NeverDeliverHemogen>Never deliver hemogen.</NeverDeliverHemogen>
@@ -10,6 +10,8 @@
   <CPS.AI>AI</CPS.AI>
   <CPS.Settings>Settings</CPS.Settings>
   <CPS.SaveDefault>Save as default</CPS.SaveDefault>
+  <CPS.ChangeSort>(change sort order)</CPS.ChangeSort>
+  <CPS.InsertTestSubject>Insert test subject</CPS.InsertTestSubject>
 
   <TSS.AutoCapture>Auto capture</TSS.AutoCapture>
   <TSS.AutoCaptureAllPrisoners>Auto capture all prisoners</TSS.AutoCaptureAllPrisoners>

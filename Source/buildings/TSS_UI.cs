@@ -298,7 +298,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 .Append(TotalNutritionAvailable.ToStringByStyle(ToStringStyle.FloatMaxOne));
         }
         if( PowerOn && currentBillReport != null ){
-            stringBuilder.AppendLineIfNotEmpty().Append("TSS_BillReport".Translate(currentBillReport.bill.Label.ToString(), currentBillReport.workLeft.ToStringWorkAmount()));
+            stringBuilder.AppendLineIfNotEmpty().Append("TSS_BillReport".Translate(JobUtility.GetResolvedJobReport(currentBillReport.medBill.recipe.jobString, currentBillReport.medBill.GiverPawn), currentBillReport.workLeft.ToStringWorkAmount()));
         }
         if( Prefs.DevMode ){
             stringBuilder.AppendLineIfNotEmpty().Append("Ticks without power: " + (Find.TickManager.TicksGame - lastTickWithPower) );

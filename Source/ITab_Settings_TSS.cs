@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
-
+using Verse.Sound;
 
 namespace zed_0xff.CPS;
 
@@ -107,6 +107,7 @@ class ITab_Settings_TSS : ITab {
         if( l.ButtonText("CPS.SaveDefault".Translate(), widthPct: 0.3f) ){
             CPSMod.Settings.tss.default_ai_config = cfg.Clone();
             CPSMod.Settings.Write();
+            SoundDefOf.Click.PlayOneShotOnCamera();
         }
 
         l.End();

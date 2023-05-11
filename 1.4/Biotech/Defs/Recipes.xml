@@ -9,6 +9,7 @@
     <products>
       <HemogenPack>1</HemogenPack>
     </products>
+    <jobString>extracting hemogen pack from TargetA.</jobString>
   </RecipeDef>
 
   <RecipeDef ParentName="CPS_ExtractHemogenPack">

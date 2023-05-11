@@ -17,6 +17,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     public /*override*/ int MaxSlots => 16;
 
     private int lastTickWithPower = 0;
+    private int lastRotate = 0;
     private int curOffset = 0;
     private int nPawns = 0;
 
@@ -302,14 +303,14 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     }
 
     public void Eject(Thing t){
+        innerContainer.TryDrop(t, InteractionCell, Map, ThingPlaceMode.Near, out _);
         if( t is Pawn || t is Corpse ){
             SoundDefOf.CryptosleepCasket_Eject.PlayOneShot(SoundInfo.InMap(this));
             if( topPawns != null ){
                 topPawns.Remove(t as Pawn);
             }
-            rotate();
+            rotate(); // should be called after TryDrop()
         }
-        innerContainer.TryDrop(t, InteractionCell, Map, ThingPlaceMode.Near, out _);
     }
 
     // </Building_Enterable>
@@ -323,6 +324,8 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     private void rotate(){
+       lastRotate = Find.TickManager.TicksGame;
+
        if ( topPawns == null ){
            topPawns = new List<Pawn>();
        } else {
@@ -418,7 +421,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 Eject(thingToEject);
             }
 
-            if (this.IsHashIntervalTick(1200)) {
+            if( Math.Abs(Find.TickManager.TicksGame - lastRotate) > 1200 ){
                 ai.Work();
                 rotate();
             }
