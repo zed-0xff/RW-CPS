@@ -154,7 +154,7 @@ Can fit up to 10 pawns in 4x2 space.</description>
     </researchPrerequisites>
     <constructionSkillPrerequisite>5</constructionSkillPrerequisite>
     <castEdgeShadows>true</castEdgeShadows>
-    <blockLight>true</blockLight>
+    <blockLight>false</blockLight>
     <staticSunShadowHeight>0.6</staticSunShadowHeight>
 
     <minifiedDef>MinifiedThing</minifiedDef>
@@ -302,7 +302,7 @@ Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
     </researchPrerequisites>
     <constructionSkillPrerequisite>12</constructionSkillPrerequisite>
     <castEdgeShadows>true</castEdgeShadows>
-    <blockLight>true</blockLight>
+    <blockLight>false</blockLight>
     <staticSunShadowHeight>0.6</staticSunShadowHeight>
     <techLevel>Spacer</techLevel>
 
