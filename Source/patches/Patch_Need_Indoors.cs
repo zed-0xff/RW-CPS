@@ -22,7 +22,7 @@ static class Patch__Need_Indoors__NeedInterval
         if( ___pawn.Spawned || IsDisabled(___pawn) )
             return true;
 
-        if( ___pawn.ParentHolder is Building_TSS ){
+        if( ___pawn.ParentHolder is Building_TSS tss && !tss.IsContentsSuspended ){
             float curLevel = __instance.CurLevel;
             const float num = 0.005f;
             __instance.CurLevel = Mathf.Min(__instance.CurLevel + num, 1f);

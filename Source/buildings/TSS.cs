@@ -29,13 +29,9 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
     [Unsaved(false)]
     private CompPowerTrader cachedPowerComp;
-
-    private CompPowerTrader PowerTraderComp
-    {
-        get
-        {
-            if (cachedPowerComp == null)
-            {
+    private CompPowerTrader PowerTraderComp {
+        get {
+            if (cachedPowerComp == null) {
                 cachedPowerComp = this.TryGetComp<CompPowerTrader>();
             }
             return cachedPowerComp;
@@ -43,6 +39,17 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     }
 
     public bool PowerOn => PowerTraderComp.PowerOn;
+
+    [Unsaved(false)]
+    private CompAffectedByFacilities cachedAffectedByFacilitiesComp;
+    public CompAffectedByFacilities AffectedByFacilitiesComp {
+        get {
+            if (cachedAffectedByFacilitiesComp == null) {
+                cachedAffectedByFacilitiesComp = this.TryGetComp<CompAffectedByFacilities>();
+            }
+            return cachedAffectedByFacilitiesComp;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // <forOwnerType>
@@ -201,13 +208,13 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish) {
         sustainerWorking = null;
-        base.DeSpawn(mode);
-    }
-
-    public float NutritionNeeded {
-        get {
-            return NutritionBuffer - TotalNutritionAvailable;
+        // destroy all add-ons on building destroy
+        List<Thing> facilities = new List<Thing>();
+        facilities.AddRange(AffectedByFacilitiesComp.LinkedFacilitiesListForReading);
+        foreach( Thing t in facilities ){
+            t.DeSpawn(mode);
         }
+        base.DeSpawn(mode);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -243,7 +250,8 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     ///////////////////////////////////////////////////////////////////////////////////////////
     // <Building_Enterable>
 
-    public override bool IsContentsSuspended => false;
+    private float timeSpeed = 1;
+    public override bool IsContentsSuspended => (timeSpeed == 0);
 
     public override Vector3 PawnDrawOffset => Vector3.zero;
 
@@ -373,16 +381,32 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 }
             }
 
-            // tick resting
-            foreach( Thing t in innerContainer ) {
-                if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
-                    pawn.needs.rest.TickResting(restEffectiveness);
+            if( !IsContentsSuspended ){
+                // tick resting
+                foreach( Thing t in innerContainer ) {
+                    if( t is Pawn pawn && !pawn.Dead && pawn.needs.rest != null) {
+                        pawn.needs.rest.TickResting(restEffectiveness);
+                    }
                 }
             }
         }
 
         base.Tick();
-        innerContainer.ThingOwnerTick();
+        switch( timeSpeed ){
+            case 2:
+                innerContainer.ThingOwnerTick();
+                innerContainer.ThingOwnerTick();
+                break;
+            case 0.5f:
+                if( Find.TickManager.TicksGame%2 == 0 ){
+                    innerContainer.ThingOwnerTick();
+                }
+                break;
+            default:
+                // time is handled by IsContentsSuspended
+                innerContainer.ThingOwnerTick();
+                break;
+        }
 
         Tick_Bills();
 
@@ -396,7 +420,19 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     // 3. rotate pawns
     // 4. feed pawns
     // 5. check DBH needs
+    // 6. update time speed
     public override void TickRare() {
+        timeSpeed = 1;
+        foreach( Thing t in AffectedByFacilitiesComp.LinkedFacilitiesListForReading ){
+            if( !t.TryGetComp<CompPowerTrader>().PowerOn ) continue;
+
+            CompProperties_TimeSpeed compTimespeed = t.def.GetCompProperties<CompProperties_TimeSpeed>();
+            if( compTimespeed == null ) continue;
+
+            timeSpeed = compTimespeed.ratio;
+            break;
+        }
+
         if( topPawns == null )
             rotate();
 
@@ -484,6 +520,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         Scribe_Deep.Look(ref allowedNutritionSettings, "allowedNutritionSettings");
         Scribe_Values.Look(ref forOwnerType, "forOwnerType", BedOwnerType.Colonist);
         Scribe_Values.Look(ref lastTickWithPower, "lastTickWithPower", 0);
+        Scribe_Values.Look(ref timeSpeed, "timeSpeed", 1);
 
         Scribe_Deep.Look(ref billStack, "bills", this);
         Scribe_Deep.Look(ref currentBillReport, "currentBillReport");

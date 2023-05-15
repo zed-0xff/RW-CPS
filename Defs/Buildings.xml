@@ -286,6 +286,13 @@ Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
       <li Class="DubsBadHygiene.CompProperties_Pipe" MayRequire="Dubwise.DubsBadHygiene">
         <mode>Sewage</mode>
       </li>
+      <li Class="CompProperties_AffectedByFacilities">
+        <linkableFacilities>
+          <li>CPS_TSS_AddOn_TimeFreeze</li>
+          <li>CPS_TSS_AddOn_TimeDilation</li>
+          <li>CPS_TSS_AddOn_TimeAcceleration</li>
+        </linkableFacilities>
+      </li>
     </comps>
     <uiOrder>2010</uiOrder>
     <tickerType>Normal</tickerType>
@@ -324,6 +331,115 @@ Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
       <li MayRequire="Ludeon.RimWorld.Biotech">CPS_BloodTransfusion_All_50</li>
     </recipes>
 
+  </ThingDef>
+
+  <DesignatorDropdownGroupDef>
+    <defName>CPS_TSS_AddOns</defName>
+    <label>TSS add-ons</label>
+  </DesignatorDropdownGroupDef>
+
+  <ThingDef Name="CPS_TSS_AddOn_Base" ParentName="BuildingBase" Abstract="True">
+    <defName>CPS_TSS_AddOn_Base</defName>
+    <clearBuildingArea>false</clearBuildingArea>
+    <designationCategory>VCHE_PipeNetworks</designationCategory>
+    <constructionSkillPrerequisite>14</constructionSkillPrerequisite>
+    <altitudeLayer>Blueprint</altitudeLayer> <!-- dunno why BuildingOnTop don't work here -->
+    <graphicData>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(2,1)</drawSize>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>50</MaxHitPoints>
+      <WorkToBuild>4096</WorkToBuild>
+      <Mass>100</Mass>
+      <Flammability>1.0</Flammability>
+    </statBases>
+    <costList>
+      <ComponentSpacer>20</ComponentSpacer>
+      <Gold>128</Gold>
+    </costList>
+    <techLevel>Spacer</techLevel>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <size>(2,1)</size>
+    <rotatable>false</rotatable>
+    <placeWorkers>
+      <li>zed_0xff.CPS.PlaceWorker_TSSAddOn</li>
+    </placeWorkers>
+    <comps>
+      <li Class="CompProperties_Facility">
+        <maxSimultaneous>1</maxSimultaneous>
+        <mustBePlacedAdjacent>true</mustBePlacedAdjacent>
+      </li>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>512</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Flickable"/>
+    </comps>
+    <designatorDropdown>CPS_TSS_AddOns</designatorDropdown>
+    <uiOrder>2011</uiOrder> <!-- next to TSS -->
+  </ThingDef>
+
+  <ThingDef ParentName="CPS_TSS_AddOn_Base">
+    <defName>CPS_TSS_AddOn_TimeDilation</defName>
+    <label>time dilation add-on</label>
+    <description>Can be built on top of TSS engine. Slows time 2x for TSS occupants.</description>
+    <graphicData>
+      <texPath>Things/Building/CPS/TSS_AddOn_TimeDilation</texPath>
+    </graphicData>
+    <researchPrerequisites>
+      <li>CPS_TimeDilation</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="zed_0xff.CPS.CompProperties_TimeSpeed">
+        <ratio>0.5</ratio>
+      </li>
+    </comps>
+    <costList>
+      <Uranium>64</Uranium>
+    </costList>
+  </ThingDef>
+
+  <ThingDef ParentName="CPS_TSS_AddOn_Base">
+    <defName>CPS_TSS_AddOn_TimeFreeze</defName>
+    <label>time freeze add-on</label>
+    <description>Can be built on top of TSS engine. Completely freezes time for TSS occupants. Like a cryptosleep casket.</description>
+    <graphicData>
+      <texPath>Things/Building/CPS/TSS_AddOn_TimeFreeze</texPath>
+    </graphicData>
+    <researchPrerequisites>
+      <li>CPS_TimeFreeze</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="zed_0xff.CPS.CompProperties_TimeSpeed">
+        <ratio>0</ratio>
+      </li>
+    </comps>
+    <costList>
+      <Uranium>128</Uranium>
+    </costList>
+  </ThingDef>
+
+  <ThingDef ParentName="CPS_TSS_AddOn_Base">
+    <defName>CPS_TSS_AddOn_TimeAcceleration</defName>
+    <label>time acceleration add-on</label>
+    <description>Can be built on top of TSS engine. Accelerates time 2x for TSS occupants.</description>
+    <graphicData>
+      <texPath>Things/Building/CPS/TSS_AddOn_TimeAcceleration</texPath>
+    </graphicData>
+    <researchPrerequisites>
+      <li>CPS_TimeAcceleration</li>
+    </researchPrerequisites>
+    <comps>
+      <li Class="zed_0xff.CPS.CompProperties_TimeSpeed">
+        <ratio>2</ratio>
+      </li>
+    </comps>
+    <costList>
+      <Plasteel>128</Plasteel>
+    </costList>
   </ThingDef>
 
 </Defs>

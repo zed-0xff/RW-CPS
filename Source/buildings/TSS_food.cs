@@ -107,6 +107,12 @@ public partial class Building_TSS {
         }
     }
 
+    public float NutritionNeeded {
+        get {
+            return IsContentsSuspended ? 0 : (NutritionBuffer - TotalNutritionAvailable);
+        }
+    }
+
     void feedOccupants(){
         if( nPawns == 0 ) return;
 

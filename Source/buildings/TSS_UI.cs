@@ -257,17 +257,15 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 });
     }
 
-    public float NutritionConsumedPerDay
-    {
-        get
-        {
+    public float NutritionConsumedPerDay {
+        get {
             float num = 0;
             foreach( Thing t in innerContainer ){
                 if( t is Pawn pawn && pawn.needs?.food != null ){
                     num += pawn.needs.food.FoodFallPerTickAssumingCategory(HungerCategory.Fed) * 60000f;
                 }
             }
-            return num;
+            return num * timeSpeed;
         }
     }
 

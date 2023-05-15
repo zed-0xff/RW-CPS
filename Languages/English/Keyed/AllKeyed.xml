@@ -15,6 +15,9 @@
 
   <TSS.AutoCapture>Auto capture</TSS.AutoCapture>
   <TSS.AutoCaptureAllPrisoners>Auto capture all prisoners</TSS.AutoCaptureAllPrisoners>
+  <TSS.MustBePlacedOn>Must be placed on TSS engine</TSS.MustBePlacedOn>
+  <TSS.OnlyOneTimeAddOnAllowed>Only one time add-on allowed</TSS.OnlyOneTimeAddOnAllowed>
+  <TSS.CannotPlaceOnBlueprint>Cannot place on blueprint</TSS.CannotPlaceOnBlueprint>
 
   <TSS.prisoners>prisoners</TSS.prisoners>
   <TSS.slaves>slaves</TSS.slaves>
