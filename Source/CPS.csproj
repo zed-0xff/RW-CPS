@@ -5,15 +5,14 @@
     <TargetFramework>net472</TargetFramework>
     <LangVersion>10</LangVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>../Assemblies</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>../Assemblies</OutputPath>
-    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>../Assemblies</OutputPath>
+    <DebugType>None</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

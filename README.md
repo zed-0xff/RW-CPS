@@ -1,4 +1,7 @@
-# The Pit
+# CPS: Compact Pawn Storage
+[![CPS: Compact Pawn Storage](About/Preview.png)](https://steamcommunity.com/sharedfiles/filedetails/?id=2974541112)
+
+## The Pit
 Just a deep hole in the ground. Only for prisoners.
 
 - Requires no research nor resources.
@@ -7,8 +10,7 @@ Just a deep hole in the ground. Only for prisoners.
 - Can be built outside. Prisoners will not be able to escape unless they have some superjump or teleport abilities.
 - Fits 5 prisoners in 2x2 space
 
-
-# Cabin
+## Cabin
 High density housing with integrated temperature controls.
 
 - Some research and resources required.
@@ -20,8 +22,7 @@ High density housing with integrated temperature controls.
 - Can be assigned to prisoners, but needs extra outside walls or high fences to contain them.
 - Fits 10 pawns in 4x2 space
 
-
-# TSS (Test Subject Storage)
+## TSS (Test Subject Storage)
 Pawns are stored in the individual capsules, in a conveyor-like rotating facility.
 Their basic needs are satisfied, but don't expect them to be happy while inside the TSS.
 The space is tight and forced sleep causes nightmares.
@@ -38,3 +39,24 @@ Warranty void if kept without power for more than 2 hours.
 - Gene Extractor now has button to process pawns contained in TSS 
 - Fits 16 pawns in 4x2 space
 
+### Verified compatible/supported mods
+
+- [Vanilla Nutrient Paste Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=2920385763)
+- [Vanilla Races Expanded - Sanguophage](https://steamcommunity.com/sharedfiles/filedetails/?id=2963116383)
+- [Vanilla Furniture Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=1845154007)
+- [Dubs Bad Hygiene](https://steamcommunity.com/sharedfiles/filedetails/?id=836308268)
+- [Lifter Plz Do More Jobs](https://steamcommunity.com/sharedfiles/filedetails/?id=2884057958)
+- [Prisoner Utils](https://steamcommunity.com/sharedfiles/filedetails/?id=2864410456)
+- [Fences And No Floors](https://steamcommunity.com/sharedfiles/filedetails/?id=1567724907)
+
+### You may also like...
+
+[![Loft Bed](https://steamuserimages-a.akamaihd.net/ugc/2030602392616950419/CAF6F6AB4C5D99E729AD70C683C0D78169B028BF/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2961708299)
+[![Connected Bed](https://steamuserimages-a.akamaihd.net/ugc/2031728856453754835/D013215D765753603B6F287EABA65E4987943552/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2957904090)
+[![YADA](https://steamuserimages-a.akamaihd.net/ugc/2031730032116745972/3AFF012AAA9C0F768199C85E3BD48533D177D40E/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2971543841)
+
+https://github.com/zed-0xff/RW-CPS
+
+## Support me
+
+[![ko-fi](https://i.imgur.com/Utx6OIH.png)](https://ko-fi.com/K3K81Z3W5) or [Patreon](https://www.patreon.com/zed_0xff)
