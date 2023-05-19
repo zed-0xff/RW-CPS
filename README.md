@@ -41,13 +41,15 @@ Warranty void if kept without power for more than 2 hours.
 
 ### Verified compatible/supported mods
 
-- [Vanilla Nutrient Paste Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=2920385763)
-- [Vanilla Races Expanded - Sanguophage](https://steamcommunity.com/sharedfiles/filedetails/?id=2963116383)
-- [Vanilla Furniture Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=1845154007)
+- [Alpha Genes](https://steamcommunity.com/sharedfiles/filedetails/?id=2891845502)
 - [Dubs Bad Hygiene](https://steamcommunity.com/sharedfiles/filedetails/?id=836308268)
+- [Fences And No Floors](https://steamcommunity.com/sharedfiles/filedetails/?id=1567724907)
 - [Lifter Plz Do More Jobs](https://steamcommunity.com/sharedfiles/filedetails/?id=2884057958)
 - [Prisoner Utils](https://steamcommunity.com/sharedfiles/filedetails/?id=2864410456)
-- [Fences And No Floors](https://steamcommunity.com/sharedfiles/filedetails/?id=1567724907)
+- [Vanilla Factions Expanded - Insectoids](https://steamcommunity.com/sharedfiles/filedetails/?id=2149755445)
+- [Vanilla Furniture Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=1845154007)
+- [Vanilla Nutrient Paste Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=2920385763)
+- [Vanilla Races Expanded - Sanguophage](https://steamcommunity.com/sharedfiles/filedetails/?id=2963116383)
 
 ### You may also like...
 

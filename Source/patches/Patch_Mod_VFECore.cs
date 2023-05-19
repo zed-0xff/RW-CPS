@@ -49,10 +49,11 @@ static class Patch_Mod_VFECore {
     }
 
     static IEnumerable<MethodBase> TargetMethods() {
-        Type t = AccessTools.TypeByName("AnimalBehaviours.HediffComp_Spawner");
-        if( t != null ){
-            MethodInfo m;
+        MethodInfo m;
+        Type t;
 
+        t = AccessTools.TypeByName("AnimalBehaviours.HediffComp_Spawner");
+        if( t != null ){
             m = AccessTools.Method(t, "TickInterval");
             if( m != null ){
                 yield return m;
@@ -64,6 +65,14 @@ static class Patch_Mod_VFECore {
             }
 
             m = AccessTools.Method(t, "TryFindSpawnCell");
+            if( m != null ){
+                yield return m;
+            }
+        }
+
+        t = AccessTools.TypeByName("VFEI.Comps.HediffComps.CompSpawnJelly");
+        if( t != null ){
+            m = AccessTools.Method(t, "CompPostTick");
             if( m != null ){
                 yield return m;
             }
