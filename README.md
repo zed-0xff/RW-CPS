@@ -52,8 +52,8 @@ Warranty void if kept without power for more than 2 hours.
 ### You may also like...
 
 [![Loft Bed](https://steamuserimages-a.akamaihd.net/ugc/2030602392616950419/CAF6F6AB4C5D99E729AD70C683C0D78169B028BF/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2961708299)
-[![Connected Bed](https://steamuserimages-a.akamaihd.net/ugc/2031728856453754835/D013215D765753603B6F287EABA65E4987943552/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2957904090)
-[![YADA](https://steamuserimages-a.akamaihd.net/ugc/2031730032116745972/3AFF012AAA9C0F768199C85E3BD48533D177D40E/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2971543841)
+[![Connected Bed](https://steamuserimages-a.akamaihd.net/ugc/2031731300513128421/33F0CC11BA63BE38DEB3FECEB9AB5B15114EE997/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2957904090)
+[![YADA](https://steamuserimages-a.akamaihd.net/ugc/2031731300519719867/4E551B5E8A5F51182BD2D8830C7E9E180D0634BC/?imw=268&imh=151&ima=fit&impolicy=Letterbox)](https://steamcommunity.com/sharedfiles/filedetails/?id=2971543841)
 
 https://github.com/zed-0xff/RW-CPS
 
