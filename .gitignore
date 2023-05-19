@@ -2,4 +2,7 @@
 *.deps.json
 *.pdb
 
+bin
+obj
+
 TODO
