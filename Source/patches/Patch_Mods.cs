@@ -29,6 +29,9 @@ static class Patch_Mods {
         if( result == null && thing is Pawn pawn && pawn.ParentHolder is Building_TSS tss && !tss.IsContentsSuspended ){
             result = tss.Map;
         }
+        if( result == null && thing is Corpse corpse && corpse.ParentHolder is Building_TSS tss2 && !tss2.IsContentsSuspended ){
+            result = tss2.Map;
+        }
         return result;
     }
 
@@ -53,6 +56,15 @@ static class Patch_Mods {
         MethodInfo m;
         Type t;
 
+        // [Alpha Genes](https://steamcommunity.com/sharedfiles/filedetails/?id=2891845502)
+        t = AccessTools.TypeByName("AlphaGenes.HediffComp_Parasites");
+        if( t != null ){
+            m = AccessTools.Method(t, "Notify_PawnDied");
+            if( m != null ){
+                yield return m;
+            }
+        }
+
         // [Vanilla Expanded Framework](https://steamcommunity.com/sharedfiles/filedetails/?id=2023507013)
         t = AccessTools.TypeByName("AnimalBehaviours.HediffComp_Spawner");
         if( t != null ){
@@ -67,6 +79,18 @@ static class Patch_Mods {
             }
 
             m = AccessTools.Method(t, "TryFindSpawnCell");
+            if( m != null ){
+                yield return m;
+            }
+        }
+        t = AccessTools.TypeByName("VanillaGenesExpanded.HediffComp_HumanEggLayer");
+        if( t != null ){
+            m = AccessTools.Method(t, "CompPostTick");
+            if( m != null ){
+                yield return m;
+            }
+
+            m = AccessTools.Method(t, "ProduceEgg");
             if( m != null ){
                 yield return m;
             }
