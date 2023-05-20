@@ -50,6 +50,7 @@ Warranty void if kept without power for more than 2 hours.
 - [Vanilla Furniture Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=1845154007)
 - [Vanilla Nutrient Paste Expanded](https://steamcommunity.com/sharedfiles/filedetails/?id=2920385763)
 - [Vanilla Races Expanded - Sanguophage](https://steamcommunity.com/sharedfiles/filedetails/?id=2963116383)
+- [WVC - Xenotypes and Genes](https://steamcommunity.com/sharedfiles/filedetails/?id=2886992038)
 
 ### You may also like...
 
