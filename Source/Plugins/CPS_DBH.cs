@@ -16,6 +16,7 @@ public class Plugin_DBH : IPlugin {
     public void ProcessPawn(Pawn pawn){
         checkThirst(pawn);
         checkBladder(pawn);
+        checkHygiene(pawn);
     }
 
     void checkBladder(Pawn pawn){
@@ -43,6 +44,16 @@ public class Plugin_DBH : IPlugin {
             thirst.Drink(100.0f);
             SanitationUtil.ContaminationCheckDrinking(pawn, WaterTaint);
         }
+    }
+
+    void checkHygiene(Pawn pawn){
+        if( pipeComp == null ) return;
+
+        Need_Hygiene need = pawn.needs.TryGetNeed<Need_Hygiene>();
+        if( need == null || need.CurLevelPercentage >= 0.75 ) return;
+        if( !pipeComp.pipeNet.PullWater(1, out var _) ) return;
+
+        need.CurLevel = 1;
     }
 
 }
