@@ -33,10 +33,12 @@ Warranty void if kept without power for more than 2 hours.
 - Built-in nutrient paste producer
 - Optionally connects to [VNPE](https://steamcommunity.com/sharedfiles/filedetails/?id=2920385763) network
 - Optionally connects to [VRE-S](https://steamcommunity.com/sharedfiles/filedetails/?id=2963116383) hemogen network
-- Optionally connects to [DBH](https://steamcommunity.com/sharedfiles/filedetails/?id=836308268) for water and bladder needs
+- Optionally connects to [DBH](https://steamcommunity.com/sharedfiles/filedetails/?id=836308268) for all hygienic needs
 - Maintains comfortable inside temperature
 - Configurable auto-capture and auto-eject settings, can automate gene extract process
-- Gene Extractor now has button to process pawns contained in TSS 
+- Gene Extractor now has button to process pawns contained in TSS
+- Can be enhanced with time dilation/acceleration/freeze researchable add-ons
+- All genetic effects like pregnancy, egg/gene/jelly/whatever spawners should keep working for TSS occupants
 - Fits 16 pawns in 4x2 space
 
 ### Verified compatible/supported mods
