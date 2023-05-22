@@ -154,6 +154,12 @@ static class Patch_Mods {
                 yield return m;
             }
         }
+
+        // don't yell there's nothing to patch if no other mods are there :)
+        yield return AccessTools.Method( typeof(Patch_Mods), nameof(Patch_Mods.Stub) );
+    }
+
+    public static void Stub(){
     }
 
     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
