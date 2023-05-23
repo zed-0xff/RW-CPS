@@ -36,7 +36,7 @@ static class Patch_IsSociallyProper {
             if (p != null) {
                 // 1. prisoner from Cabin wants to access smth in adjacent prison district
                 Room room = p.GetRoom();
-                if( room != null && Cache.IsCabin(room) && p.GetDistrict().Neighbors.Contains(t.GetDistrict()) ){
+                if( room != null && Cache.IsCabin(room) && p.GetDistrict().Neighbors.Contains(cell.GetDistrict(t.Map)) ){
                     return true;
                 }
                 // 2. prisoner from prison district wants to go back to adjacent Cabin
