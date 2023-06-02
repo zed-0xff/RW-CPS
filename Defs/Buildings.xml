@@ -51,6 +51,7 @@ Can fit up to 5 prisoners in 2x2 space.</description>
         <drawAssignmentOverlay>false</drawAssignmentOverlay>
         <compClass>CompAssignableToPawn_Bed</compClass>
       </li>
+      <li Class="MoreSlaveryStuff.CompMixableProperties" MayRequire="GarryFlowers.MoreSlaveryStuff"/>
     </comps>
     <uiOrder>2051</uiOrder>
     <uiIconPath>Things/Building/CPS/ThePit_north</uiIconPath>

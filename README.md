@@ -54,6 +54,7 @@ Warranty void if kept without power for more than 2 hours.
 - [Vanilla Races Expanded - Sanguophage](https://steamcommunity.com/sharedfiles/filedetails/?id=2963116383)
 - [WVC - Xenotypes and Genes](https://steamcommunity.com/sharedfiles/filedetails/?id=2886992038)
 - [Vanilla Races Expanded - Android](https://steamcommunity.com/sharedfiles/filedetails/?id=2975771801)
+- [More Slavery Stuff](https://steamcommunity.com/sharedfiles/filedetails/?id=2896845138)
 
 ### You may also like...
 
