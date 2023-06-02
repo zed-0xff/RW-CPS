@@ -13,9 +13,10 @@ namespace zed_0xff.CPS;
 [HarmonyPatch(typeof(Room), "get_ProperRoom")]
 static class Patch_ProperRoom
 {
-    public static void Postfix(ref bool __result, ref Room __instance)
+    public static void Postfix(ref bool __result, Room __instance)
     {
         if( __result ) return;
+        if( __instance == null || __instance.Cells == null || __instance.Cells.Count() == 0 ) return;
 
         Building_Base b = Cache.Get(__instance.Cells.First(), __instance.Map);
         if( b != null ){
