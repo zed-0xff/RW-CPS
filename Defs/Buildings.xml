@@ -241,7 +241,7 @@ Holds 16 pawns in 4x2 space. Does not act like a regular bed.</description>
     </building>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <designationCategory>VCHE_PipeNetworks</designationCategory>
-    <fillPercent>0.8</fillPercent>
+    <fillPercent>1</fillPercent>
     <drawGUIOverlay>true</drawGUIOverlay>
     <comps>
       <li MayRequire="VanillaExpanded.VNutrientE" Class="PipeSystem.CompProperties_Resource">
