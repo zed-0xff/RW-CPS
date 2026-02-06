@@ -362,13 +362,24 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
        }
     }
 
+#if RW16
+    // 1.6: ThingOwner tick method name may differ; use reflection so we don't depend on it at compile time.
+    private static void InnerContainerTick(ThingOwner container)
+    {
+        var type = container.GetType();
+        var m = type.GetMethod("ThingOwnerTick", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null)
+            ?? type.GetMethod("Tick", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+        m?.Invoke(container, null);
+    }
+#endif
+
     // 1. play recipeSound (does not play if called in rare tick)
     // 2. tick contained pawns
     // 3. make them rest
     // 4. do bills
     // 5. tick effects
     // 6. call TickRare()
-    public override void Tick()
+    protected override void Tick()
     {
         if( PowerOn ){
             if ( nPawns > 0 ){
@@ -394,17 +405,30 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         base.Tick();
         switch( timeSpeed ){
             case 2:
+#if RW16
+                InnerContainerTick(innerContainer);
+                InnerContainerTick(innerContainer);
+#else
                 innerContainer.ThingOwnerTick();
                 innerContainer.ThingOwnerTick();
+#endif
                 break;
             case 0.5f:
                 if( Find.TickManager.TicksGame%2 == 0 ){
+#if RW16
+                    InnerContainerTick(innerContainer);
+#else
                     innerContainer.ThingOwnerTick();
+#endif
                 }
                 break;
             default:
                 // time is handled by IsContentsSuspended
+#if RW16
+                InnerContainerTick(innerContainer);
+#else
                 innerContainer.ThingOwnerTick();
+#endif
                 break;
         }
 

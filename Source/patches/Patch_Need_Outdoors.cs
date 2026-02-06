@@ -12,10 +12,12 @@ static class Patch__Need_Outdoors__NeedInterval
 {
 
     private static bool IsDisabled(Pawn pawn) {
-        if (!pawn.Dead) {
-            return !pawn.needs.EnjoysOutdoors();
-        }
-        return true;
+        if (pawn.Dead) return true;
+#if RW16
+        return !pawn.needs.PrefersOutdoors;
+#else
+        return !pawn.needs.EnjoysOutdoors();
+#endif
     }
 
     static bool Prefix(ref Need_Outdoors __instance, ref Pawn ___pawn, ref float ___lastEffectiveDelta){

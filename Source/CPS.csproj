@@ -16,6 +16,9 @@
   <PropertyGroup Condition="'$(RimWorldVersion)' == '1.5' Or '$(RimWorldVersion)' == '1.6'">
     <DefineConstants>$(DefineConstants);RW15</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(RimWorldVersion)' == '1.6'">
+    <DefineConstants>$(DefineConstants);RW16</DefineConstants>
+  </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>None</DebugType>

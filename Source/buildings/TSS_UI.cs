@@ -254,8 +254,10 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     // only needed between a call to GetMultiSelectFloatMenuOptions() and a click on popped-up item
     private static List<Pawn> tmpQueuedPawns = new List<Pawn>();
 
+#if !RW16
     // called only if multiple _colonists_ are selected
     // selected prisoners are just ignored
+    // (removed in 1.6: base no longer has this method to override)
     public override IEnumerable<FloatMenuOption> GetMultiSelectFloatMenuOptions(List<Pawn> selPawns)
     {
         tmpQueuedPawns.Clear();
@@ -284,6 +286,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 tmpQueuedPawns.Clear();
                 });
     }
+#endif
 
     public float NutritionConsumedPerDay {
         get {
