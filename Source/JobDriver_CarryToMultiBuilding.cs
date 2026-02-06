@@ -19,6 +19,13 @@ public class JobDriver_CarryToMultiBuilding : JobDriver
         return true;
     }
 
+    private static bool CanBuildingAcceptTakee(Building_MultiEnterable building, Pawn takee, bool forcePrisoner)
+    {
+        if (building is Building_TSS tss)
+            return tss.CanAcceptPawn(takee, forcePrisoner);
+        return building.CanAcceptPawn(takee);
+    }
+
     private void CheckMakeTakeePrisoner() {
         if (job.def.makeTargetPrisoner)
         {
@@ -43,7 +50,7 @@ public class JobDriver_CarryToMultiBuilding : JobDriver
     {
         this.FailOnDestroyedOrNull(TargetIndex.B);
         this.FailOnDespawnedNullOrForbidden(TargetIndex.A);
-        this.FailOn(() => !Building.CanAcceptPawn(Takee) || !Building.SelectedPawns.Contains(Takee));
+        this.FailOn(() => !CanBuildingAcceptTakee(Building, Takee, job.def.makeTargetPrisoner) || !Building.SelectedPawns.Contains(Takee));
         // for proper canceling of a pending job -----------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         yield return Toils_General.Do(delegate
                 {

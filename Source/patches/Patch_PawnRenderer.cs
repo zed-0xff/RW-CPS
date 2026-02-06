@@ -1,16 +1,51 @@
 using HarmonyLib;
 using RimWorld;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace zed_0xff.CPS;
 
-// called for any Find.CameraDriver.ZoomRootSize
-// XXX called only for sleeping pawns
+// GetBodyPos: only used here for bed head fix (showBody = false + FixSleepingPawnHeadPos when in Building_Base).
+// Body hiding for standing Pit prisoners is done only by Patch_PawnRenderNodeWorker_Body_CanDrawNow.
+#if RW16
+// 1.6: GetBodyPos(Vector3 drawLoc, PawnPosture posture, out bool showBody)
+[HarmonyPatch(typeof(PawnRenderer))]
+[HarmonyPriority(Priority.Last)]
+static class Patch_GetBodyPos_16
+{
+    static MethodBase TargetMethod()
+    {
+        foreach (var m in typeof(PawnRenderer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+        {
+            if (m.Name != "GetBodyPos") continue;
+            var ps = m.GetParameters();
+            // 1.6: (Vector3 drawLoc, PawnPosture posture, out bool showBody) — match by param count and first arg
+            if (ps.Length == 3 && ps[0].ParameterType == typeof(Vector3))
+                return m;
+        }
+        throw new InvalidOperationException("CPS: PawnRenderer.GetBodyPos(Vector3, PawnPosture, out bool) not found.");
+    }
+
+    static void Postfix(ref bool showBody, ref Vector3 __result, Pawn ___pawn)
+    {
+        if (___pawn == null || !___pawn.RaceProps.Humanlike) return;
+        Building_Base b = Cache.Get(___pawn.Position, ___pawn.Map);
+        if (b != null && ___pawn.GetPosture().InBed())
+        {
+            showBody = false;
+            b.FixSleepingPawnHeadPos(ref ___pawn, ref __result);
+        }
+    }
+}
+#else
 [HarmonyPatch(typeof(PawnRenderer), "GetBodyPos")]
-[HarmonyPriority(Priority.Last)] // make it last to fix any offsets by other mods, fixes Yayo's animations
+[HarmonyPriority(Priority.Last)]
 static class Patch_GetBodyPos
 {
     static void Postfix(PawnRenderer __instance, Vector3 drawLoc, ref bool showBody, ref Vector3 __result, Pawn ___pawn)
@@ -21,18 +56,18 @@ static class Patch_GetBodyPos
         if( b == null ) return;
 
         if( ___pawn.GetPosture().InBed()){
-            // draw only heads of sleeping pawns
             showBody = false;
             b.FixSleepingPawnHeadPos(ref ___pawn, ref __result);
         }
     }
 }
+#endif
 
-
-// XXX called only when Find.CameraDriver.ZoomRootSize < 18f
-// called for both sleeping and not sleeping pawns
+#if RW16
+// 1.6: body hiding only via CanDrawNow; no RenderPawnInternal patch
+#else
 [HarmonyPatch(typeof(PawnRenderer), "RenderPawnInternal")]
-[HarmonyPriority(Priority.Last)] // TODO: check with Yayo's animations
+[HarmonyPriority(Priority.Last)]
 static class Patch_RenderPawnInternal
 {
     static void Prefix(ref PawnRenderer __instance, ref Vector3 rootLoc, ref bool renderBody, Pawn ___pawn){
@@ -42,29 +77,13 @@ static class Patch_RenderPawnInternal
         if( b == null ) return;
 
         if( b is Building_ThePit && ___pawn.IsPrisonerOfColony && !___pawn.GetPosture().InBed() ){
-            // hide bodies of not sleeping prisoners
             renderBody = false;
             rootLoc.z -= 0.4f;
         }
     }
 }
+#endif
 
-
-// XXX called only when Find.CameraDriver.ZoomRootSize > 18f
-//    [HarmonyPatch(typeof(PawnRenderer), "GetBlitMeshUpdatedFrame")]
-//    [HarmonyPriority(Priority.Last)] // not sure
-//    static class Patch_GetBlitMeshUpdatedFrame
-//    {
-//        static void Prefix(ref PawnRenderer __instance, ref PawnDrawMode drawMode){
-//            Pawn pawn = _pawn(__instance);
-//            if( !pawn.RaceProps.Humanlike ) return;
-//
-//            Building_Base b = Cache.Get(pawn.Position, pawn.Map);
-//            if( b == null ) return;
-//
-//            drawMode = PawnDrawMode.HeadOnly;
-//        }
-//    }
 
 // fix pawn head rotation for any Find.CameraDriver.ZoomRootSize
 // cached, requires pawn to go out of bed and back to update
@@ -86,6 +105,23 @@ static class Patch_BodyAngle
 }
 
 // draw no shadow for not sleeping pawns in the pit
+#if RW16
+// 1.6: shadow is drawn from RenderPawnAt -> DrawShadowInternal (and from DrawTracker -> RenderShadowOnlyAt -> DrawShadowInternal). Patch the single implementation.
+[HarmonyPatch(typeof(PawnRenderer), "DrawShadowInternal")]
+static class Patch_PawnRenderer_DrawShadowInternal
+{
+    static readonly FieldInfo f_pawn = typeof(PawnRenderer).GetField("pawn", BindingFlags.NonPublic | BindingFlags.Instance);
+
+    static bool Prefix(PawnRenderer __instance)
+    {
+        if (f_pawn?.GetValue(__instance) is not Pawn pawn) return true;
+        if (pawn.IsPrisonerOfColony && Cache.Get(pawn.Position, pawn.Map) is Building_ThePit)
+            return false;
+        return true;
+    }
+}
+
+#else
 [HarmonyPatch(typeof(PawnRenderer), "DrawInvisibleShadow")]
 static class Patch_DrawInvisibleShadow
 {
@@ -96,3 +132,19 @@ static class Patch_DrawInvisibleShadow
         return true;
     }
 }
+#endif
+
+#if RW16
+[HarmonyPatch(typeof(PawnRenderNodeWorker_Body), nameof(PawnRenderNodeWorker_Body.CanDrawNow))]
+static class Patch_PawnRenderNodeWorker_Body_CanDrawNow
+{
+    static bool Prefix(PawnRenderNode node, ref bool __result)
+    {
+        if (node?.tree?.pawn is not Pawn pawn || !pawn.RaceProps.Humanlike) return true;
+        if (!pawn.IsPrisonerOfColony || pawn.GetPosture().InBed()) return true;
+        if (Cache.Get(pawn.Position, pawn.Map) is not Building_ThePit) return true;
+        __result = false;
+        return false;
+    }
+}
+#endif

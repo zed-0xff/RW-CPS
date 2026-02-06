@@ -1,15 +1,15 @@
 using HarmonyLib;
 using RimWorld;
-using System;
 using System.Collections.Generic;
 using Verse;
 using Verse.AI;
 
 namespace zed_0xff.CPS;
 
+#if !RW16
 [HarmonyPatch(typeof(FloatMenuMakerMap), "AddHumanlikeOrders")]
-public static class Patch_AddHumanlikeOrders {
-
+public static class Patch_AddHumanlikeOrders
+{
     static Building_TSS GetClosestTSS(Pawn targetPawn, Pawn pawn){
         return (Building_TSS)GenClosest.ClosestThingReachable(
                 targetPawn.PositionHeld,
@@ -82,3 +82,85 @@ public static class Patch_AddHumanlikeOrders {
         }
     }
 }
+#else
+// 1.6: FloatMenuMakerMap uses GetOptions + providers; insert Capture/Arrest to TSS after vanilla options
+[HarmonyPatch(typeof(FloatMenuMakerMap), nameof(FloatMenuMakerMap.GetOptions))]
+public static class Patch_FloatMenuMakerMap_GetOptions_16
+{
+    static Building_TSS GetClosestTSS(Pawn targetPawn, Pawn pawn)
+    {
+        return (Building_TSS)GenClosest.ClosestThingReachable(
+            targetPawn.PositionHeld,
+            targetPawn.MapHeld,
+            ThingRequest.ForDef(VDefOf.CPS_TSS),
+            PathEndMode.InteractionCell,
+            TraverseParms.For(pawn),
+            9999f,
+            (Thing b) => ((Building_TSS)b).CanAcceptPawn(targetPawn, forcePrisoner: true)
+        );
+    }
+
+    static void CaptureToTSS(Pawn targetPawn, Pawn pawn)
+    {
+        var tss = GetClosestTSS(targetPawn, pawn);
+        if (tss == null)
+            Messages.Message("CannotCapture".Translate() + ": " + "NoPrisonerBed".Translate(), targetPawn, MessageTypeDefOf.RejectInput, historical: false);
+        else
+        {
+            tss.SelectPawn2(targetPawn);
+            var job = JobMaker.MakeJob(VDefOf.CaptureToTSS, tss, targetPawn);
+            job.count = 1;
+            pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+            if (targetPawn.Faction != null && targetPawn.Faction != Faction.OfPlayer && !targetPawn.Faction.Hidden && !targetPawn.Faction.HostileTo(Faction.OfPlayer) && !targetPawn.IsPrisonerOfColony)
+                Messages.Message("MessageCapturingWillAngerFaction".Translate(targetPawn.Named("PAWN")).AdjustedFor(targetPawn), targetPawn, MessageTypeDefOf.CautionInput, historical: false);
+        }
+    }
+
+    static void ArrestToTSS(Pawn targetPawn, Pawn pawn)
+    {
+        var tss = GetClosestTSS(targetPawn, pawn);
+        if (tss == null)
+            Messages.Message("CannotArrest".Translate() + ": " + "NoPrisonerBed".Translate(), targetPawn, MessageTypeDefOf.RejectInput, historical: false);
+        else
+        {
+            tss.SelectPawn2(targetPawn);
+            var job = JobMaker.MakeJob(VDefOf.ArrestToTSS, targetPawn, tss);
+            job.count = 1;
+            pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
+        }
+    }
+
+    static void Postfix(List<FloatMenuOption> __result, FloatMenuContext context)
+    {
+        if (!CPSMod.Settings.tss.menus || context?.FirstSelectedPawn is not Pawn pawn) return;
+        int n = __result.Count;
+        for (int i = 0; i < n; i++)
+        {
+            var opt = __result[i];
+            if (opt.revalidateClickTarget is not Pawn targetPawn) continue;
+            var sCapture = "Capture".Translate(targetPawn.LabelCap, targetPawn);
+            if (opt.Label == sCapture)
+            {
+                if (GetClosestTSS(targetPawn, pawn) != null)
+                {
+                    var sCaptureToTSS = "CaptureToTSS".Translate(targetPawn.LabelCap, targetPawn);
+                    __result.Insert(i + 1, FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(sCaptureToTSS, () => CaptureToTSS(targetPawn, pawn), MenuOptionPriority.RescueOrCapture, null, targetPawn), pawn, targetPawn));
+                    n++;
+                    i++;
+                }
+            }
+            else
+            {
+                var sArrest = "TryToArrest".Translate(targetPawn.LabelCap, targetPawn, targetPawn.GetAcceptArrestChance(pawn).ToStringPercent());
+                if (opt.Label == sArrest && GetClosestTSS(targetPawn, pawn) != null)
+                {
+                    var sArrestToTSS = "ArrestToTSS".Translate(targetPawn.LabelCap, targetPawn);
+                    __result.Insert(i + 1, FloatMenuUtility.DecoratePrioritizedTask(new FloatMenuOption(sArrestToTSS, () => ArrestToTSS(targetPawn, pawn), MenuOptionPriority.High, null, targetPawn), pawn, targetPawn));
+                    n++;
+                    i++;
+                }
+            }
+        }
+    }
+}
+#endif
