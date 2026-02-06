@@ -5,6 +5,9 @@ using RimWorld;
 using Verse;
 using Verse.Sound;
 using UnityEngine;
+#if RW15
+using LudeonTK;
+#endif
 
 namespace zed_0xff.CPS;
 

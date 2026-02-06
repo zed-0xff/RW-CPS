@@ -64,6 +64,16 @@ Warranty void if kept without power for more than 2 hours.
 
 https://github.com/zed-0xff/RW-CPS
 
+## Building
+
+Supports RimWorld 1.4, 1.5, and 1.6. From `Source/`:
+
+- **1.4**: `dotnet build -c Release -p:RimWorldVersion=1.4`
+- **1.5**: `dotnet build -c Release -p:RimWorldVersion=1.5`
+- **1.6**: `dotnet build -c Release` (default)
+
+Run all three for a single mod that works in all games.
+
 ## Support me
 
 [![ko-fi](https://i.imgur.com/Utx6OIH.png)](https://ko-fi.com/K3K81Z3W5) or [Patreon](https://www.patreon.com/zed_0xff)

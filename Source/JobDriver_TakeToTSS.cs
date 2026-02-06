@@ -139,7 +139,11 @@ public class JobDriver_TakeToTSS : JobDriver
 			if (Takee.guest.Released)
 			{
 				Takee.guest.Released = false;
+#if RW15
+				Takee.guest.SetExclusiveInteraction(PrisonerInteractionModeDefOf.MaintainOnly);
+#else
 				Takee.guest.interactionMode = PrisonerInteractionModeDefOf.NoInteraction;
+#endif
 				GenGuest.RemoveHealthyPrisonerReleasedThoughts(Takee);
 			}
 			if (!Takee.IsPrisonerOfColony)

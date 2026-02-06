@@ -64,6 +64,37 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
         }
     }
 
+#if RW15
+    protected override void DrawAt(Vector3 drawLoc, bool flip = false)
+    {
+        base.DrawAt(drawLoc, flip);
+
+        if( topPawns != null && topPawns.Any() ){
+            int i = 0;
+            foreach( Pawn pawn in topPawns ){
+                pawn.Drawer.renderer.RenderPawnAt(drawLoc + PawnDrawOffsets[i], null, neverAimWeapon: true);
+                i++;
+                if( i == 4 ) break;
+            }
+        }
+
+        for( int i = 0; i < 4; i++ ){
+            TopGraphic.Draw(drawLoc + PawnDrawOffsets[i] + Altitudes.AltIncVect * 2f, base.Rotation, this);
+        }
+
+        if( currentBillReport != null && (int)Find.CameraDriver.CurrentZoom == 0 ){
+            GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
+            r.center = drawLoc;
+            r.center.z += 0.25f;
+            r.size = BarSize;
+            r.fillPercent = 1f - Mathf.Clamp01(currentBillReport.workLeft / currentBillReport.workTotal);
+            r.filledMat = FilledMat;
+            r.unfilledMat = UnfilledMat;
+            r.margin = 0.08f;
+            GenDraw.DrawFillableBar(r);
+        }
+    }
+#else
     public override void Draw()
     {
         base.Draw();
@@ -73,10 +104,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             foreach( Pawn pawn in topPawns ){
                 pawn.Drawer.renderer.RenderPawnAt(DrawPos + PawnDrawOffsets[i], null, neverAimWeapon: true);
                 i++;
-                if( i == 4 ){
-                    // should not be here, just in case
-                    break;
-                }
+                if( i == 4 ) break;
             }
         }
 
@@ -84,7 +112,6 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             TopGraphic.Draw(DrawPos + PawnDrawOffsets[i] + Altitudes.AltIncVect * 2f, base.Rotation, this);
         }
 
-        // draw red recipe progressbar
         if( currentBillReport != null && (int)Find.CameraDriver.CurrentZoom == 0){
             GenDraw.FillableBarRequest r = default(GenDraw.FillableBarRequest);
             r.center = DrawPos;
@@ -97,6 +124,7 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
             GenDraw.DrawFillableBar(r);
         }
     }
+#endif
 
     // draw assigned/total slots count
     public override void DrawGUIOverlay()

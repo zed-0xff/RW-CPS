@@ -114,11 +114,15 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 var hediff = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
                 if( hediff == null ){
                     // donor
-                    if( pawn.genes != null && pawn.genes.HasGene(GeneDefOf.Hemogenic)) continue;
+                    if( pawn.genes != null && pawn.genes.HasActiveGene(GeneDefOf.Hemogenic)) continue;
 
                     if( pawn.IsPrisonerOfColony ){
                         dict[PatientType.Donor_Prisoner] = pawn;
+#if RW15
+                        if( pawn?.guest?.ExclusiveInteractionMode == PrisonerInteractionModeDefOf.HemogenFarm ){
+#else
                         if( pawn?.guest?.interactionMode == PrisonerInteractionModeDefOf.HemogenFarm ){
+#endif
                             dict[PatientType.Donor_HemogenFarmPrisoner] = pawn;
                         }
                     } else if( pawn.IsSlaveOfColony ){

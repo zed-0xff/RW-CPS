@@ -23,7 +23,7 @@ static class Patch_FoodAvailableInRoomTo {
             }
         }
         foreach( Pawn pawn in region.ListerThings.ThingsInGroup(ThingRequestGroup.Pawn) ){
-            if (pawn.IsPrisonerOfColony && pawn.needs.food.CurLevelPercentage < pawn.needs.food.PercentageThreshHungry + 0.02f && (pawn.carryTracker.CarriedThing == null || !pawn.WillEat_NewTemp(pawn.carryTracker.CarriedThing))) {
+            if (pawn.IsPrisonerOfColony && pawn.needs.food.CurLevelPercentage < pawn.needs.food.PercentageThreshHungry + 0.02f && (pawn.carryTracker.CarriedThing == null || !pawn.WillEat(pawn.carryTracker.CarriedThing))) {
                 nAvail -= pawn.needs.food.NutritionWanted;
             }
         }

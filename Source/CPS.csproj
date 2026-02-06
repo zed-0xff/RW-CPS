@@ -5,10 +5,16 @@
     <TargetFramework>net472</TargetFramework>
     <LangVersion>10</LangVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>../Assemblies</OutputPath>
+    <!-- Default 1.6; use -p:RimWorldVersion=1.4 or 1.5 for older. Output: 1.4/Assemblies, 1.5/Assemblies, or 1.6/Assemblies. -->
+    <RimWorldVersion Condition="'$(RimWorldVersion)' == ''">1.6</RimWorldVersion>
+    <OutputPath>../$(RimWorldVersion)/Assemblies</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RimWorldVersion)' == '1.5' Or '$(RimWorldVersion)' == '1.6'">
+    <DefineConstants>$(DefineConstants);RW15</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -21,25 +27,18 @@
 
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="2.2.2" ExcludeAssets="runtime" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>false</Private>
-     </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+    <PackageReference Include="Krafs.Rimworld.Ref" Condition="'$(RimWorldVersion)' == '1.4'">
+      <Version>1.4.*</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Krafs.Rimworld.Ref" Condition="'$(RimWorldVersion)' == '1.5'">
+      <Version>1.5.*</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Krafs.Rimworld.Ref" Condition="'$(RimWorldVersion)' == '1.6'">
+      <Version>1.6.*</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
