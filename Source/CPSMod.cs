@@ -77,7 +77,8 @@ public class CPSMod : Mod
 
     private void LoadPlugin(ModContentPack content, string name){
         try {
-            string fname = Path.Combine(content.RootDir, "Plugins", "CPS_" + name + ".dll");
+            string assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string fname = Path.Combine(assemblyDir, "..", "Plugins", "CPS_" + name + ".dll");
             byte[] rawAssembly = File.ReadAllBytes(fname);
             Assembly assembly = AppDomain.CurrentDomain.Load(rawAssembly);
             Log.Message("[d] CPS loaded plugin " + assembly);

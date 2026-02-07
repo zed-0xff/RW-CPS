@@ -114,7 +114,11 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
                 var hediff = pawn.health.hediffSet.GetFirstHediffOfDef(HediffDefOf.BloodLoss);
                 if( hediff == null ){
                     // donor
+#if RW15
                     if( pawn.genes != null && pawn.genes.HasActiveGene(GeneDefOf.Hemogenic)) continue;
+#else
+                    if( pawn.genes != null && pawn.genes.HasGene(GeneDefOf.Hemogenic)) continue;
+#endif
 
                     if( pawn.IsPrisonerOfColony ){
                         dict[PatientType.Donor_Prisoner] = pawn;

@@ -379,7 +379,11 @@ public partial class Building_TSS : Building_MultiEnterable, IStoreSettingsParen
     // 4. do bills
     // 5. tick effects
     // 6. call TickRare()
+#if RW16
     protected override void Tick()
+#else
+    public override void Tick()
+#endif
     {
         if( PowerOn ){
             if ( nPawns > 0 ){

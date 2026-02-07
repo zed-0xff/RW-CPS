@@ -5,15 +5,16 @@
         <TargetFramework>net472</TargetFramework>
         <LangVersion>10</LangVersion>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <RimWorldVersion Condition="'$(RimWorldVersion)' == ''">1.6</RimWorldVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <OutputPath>../../Plugins</OutputPath>
+        <OutputPath>../../$(RimWorldVersion)/Plugins</OutputPath>
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <OutputPath>../../Plugins</OutputPath>
+        <OutputPath>../../$(RimWorldVersion)/Plugins</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,16 +23,24 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Assembly-CSharp">
-            <HintPath>..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-            <Private>false</Private>
-        </Reference>
+        <PackageReference Include="Krafs.Rimworld.Ref" Condition="'$(RimWorldVersion)' == '1.4'">
+            <Version>1.4.*</Version>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <PackageReference Include="Krafs.Rimworld.Ref" Condition="'$(RimWorldVersion)' == '1.5'">
+            <Version>1.5.*</Version>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <PackageReference Include="Krafs.Rimworld.Ref" Condition="'$(RimWorldVersion)' == '1.6'">
+            <Version>1.6.*</Version>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
         <Reference Include="CPS">
-            <HintPath>../../Assemblies/CPS.dll</HintPath>
+            <HintPath>../../$(RimWorldVersion)/Assemblies/CPS.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="BadHygiene">
-            <HintPath>../../../../workshop/836308268/1.4/Assemblies/BadHygiene.dll</HintPath>
+            <HintPath>../../../../workshop/836308268/$(RimWorldVersion)/Assemblies/BadHygiene.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
